@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mes votes – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/voter.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <nav class="navigation" aria-label="Menu principal">
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="bandeau">
+      <div class="ligne-flex">
+        <div>
+          <h1>Mes votes</h1>
+          <p id="identite">Chargement…</p>
+        </div>
+        <button id="deconnexion" class="bouton bouton-accent" type="button">Se déconnecter</button>
+      </div>
+    </section>
+
+    <div id="message-general"></div>
+    <div id="liste-scrutins" class="section"></div>
+  </main>
+
+  <dialog id="confirmation" aria-labelledby="titre-confirmation">
+    <h2 id="titre-confirmation">Confirmer mon vote</h2>
+    <p id="texte-confirmation"></p>
+    <p class="texte-doux petit">Ce choix est définitif : on ne peut pas revenir dessus.</p>
+    <div class="rangee-boutons">
+      <button id="confirmer" class="bouton bouton-accent" type="button">Confirmer mon vote</button>
+      <button id="annuler" class="bouton bouton-contour" type="button">Annuler</button>
+    </div>
+  </dialog>
+
+  <footer class="pied">Votre participation est enregistrée, votre choix jamais.</footer>
+</body>
+</html>

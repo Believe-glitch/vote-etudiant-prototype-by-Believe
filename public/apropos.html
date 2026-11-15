@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>À propos – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/page-simple.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <nav class="navigation" aria-label="Menu principal">
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>À propos du projet</h1>
+
+    <section class="carte section">
+      <h2>Le projet</h2>
+      <p>Ce site permet d’organiser les élections étudiantes de l’Université Révérend Kim, sur les sites de Lingwala et de N’djili : CP, CPA et secrétaire de chaque promotion, et présidence de l’université.</p>
+      <p>Il garantit trois choses : <strong>simple</strong> (on vote en une minute depuis son téléphone), <strong>juste</strong> (un étudiant, un code, une voix par poste) et <strong>transparent</strong> (participation en direct, résultats dévoilés à tous, choix secret).</p>
+    </section>
+
+    <section class="carte section">
+      <h2>Prototype de démonstration</h2>
+      <p>Cette version est un prototype : les étudiants et les candidats sont fictifs. Elle sert à montrer le fonctionnement du site avant sa validation par l’université.</p>
+    </section>
+
+    <section class="carte section">
+      <h2>Comment le site est construit</h2>
+      <p>Toutes les règles du vote sont vérifiées par le serveur, et une partie d’entre elles directement par la base de données. Même quelqu’un qui modifie la page dans son navigateur ne peut pas les contourner.</p>
+      <p class="texte-doux">Serveur Node.js (Fastify), base de données PostgreSQL, pages légères sans framework pour fonctionner sur tous les téléphones.</p>
+    </section>
+
+    <p class="section"><a class="bouton bouton-contour" href="/admin/">Espace officiels</a></p>
+  </main>
+
+  <footer class="pied">Prototype de démonstration · Université Révérend Kim</footer>
+</body>
+</html>

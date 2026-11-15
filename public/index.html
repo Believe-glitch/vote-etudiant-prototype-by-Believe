@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vote étudiant prototype – Université Révérend Kim</title>
+  <meta name="description" content="Élections étudiantes de l’Université Révérend Kim : CP, CPA, secrétaires et présidence.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/accueil.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <nav class="navigation" aria-label="Menu principal">
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="bandeau">
+      <p class="pastille pastille-devoile">Université Révérend Kim · Lingwala et N’djili</p>
+      <h1>Élections étudiantes</h1>
+      <p>Élisez le CP, le CPA et le secrétaire de votre promotion, ainsi que le président et le vice-président de l’université. Un étudiant, un code, une voix par poste. Votre choix reste secret.</p>
+    </section>
+
+    <div class="grille-2 section">
+      <section class="carte" aria-labelledby="titre-etudiant">
+        <h2 id="titre-etudiant">Je suis étudiant</h2>
+        <div id="deja-connecte" class="cache">
+          <p>Vous êtes déjà connecté avec votre code.</p>
+          <a class="bouton bouton-accent bouton-large" href="/voter">Aller à mes votes</a>
+        </div>
+        <form id="formulaire-code" novalidate>
+          <div class="champ">
+            <label for="code">Mon code de vote</label>
+            <input id="code" name="code" type="text" class="champ-code" placeholder="L2INF-LIN-XXXXXX"
+                   autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" required>
+          </div>
+          <div id="message-code"></div>
+          <button class="bouton bouton-accent bouton-large" type="submit">Me connecter pour voter</button>
+          <p class="petit texte-doux">Vous n’avez pas de code ? Récupérez-le auprès d’un officiel, avec votre carte d’étudiant.</p>
+        </form>
+      </section>
+
+      <section class="carte carte-simple" aria-labelledby="titre-visiteur">
+        <h2 id="titre-visiteur">Je suis visiteur</h2>
+        <p>Sans code, vous pouvez découvrir les candidats de chaque promotion et de la présidence, suivre la participation en direct et consulter les résultats.</p>
+        <div class="rangee-boutons">
+          <a class="bouton" href="/candidats">Voir les candidats</a>
+          <a class="bouton bouton-contour" href="/resultats">Voir les résultats</a>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" aria-labelledby="titre-direct">
+      <h2 id="titre-direct">Votes en cours</h2>
+      <div id="votes-en-cours" class="grille-3">
+        <p class="texte-doux">Chargement…</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titre-comment">
+      <h2 id="titre-comment">Comment ça marche</h2>
+      <div class="grille-3">
+        <div class="carte carte-simple">
+          <p class="etape-numero">1</p>
+          <h3>Je reçois mon code</h3>
+          <p class="texte-doux">Chaque inscrit reçoit un code unique chez l’officiel chargé des codes, ou en auditoire.</p>
+        </div>
+        <div class="carte carte-simple">
+          <p class="etape-numero">2</p>
+          <h3>Je vote</h3>
+          <p class="texte-doux">Pendant la séance, je tape mon code et je vote pour chaque poste de ma promotion et pour la présidence.</p>
+        </div>
+        <div class="carte carte-simple">
+          <p class="etape-numero">3</p>
+          <h3>Les résultats</h3>
+          <p class="texte-doux">À la fin du décompte, le vote se ferme. Les résultats sont dévoilés à tous en même temps.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">Prototype de démonstration · Université Révérend Kim</footer>
+</body>
+</html>

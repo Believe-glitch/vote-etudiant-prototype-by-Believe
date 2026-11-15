@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Règles – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/page-simple.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <nav class="navigation" aria-label="Menu principal">
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>Les règles du vote</h1>
+
+    <div class="grille-2 section">
+      <section class="carte">
+        <h2>Ce qu’on élit</h2>
+        <p><strong>Dans chaque promotion :</strong> le CP, le CPA et le secrétaire. Seuls les étudiants de la promotion votent.</p>
+        <p><strong>Pour l’université :</strong> le président et le vice-président. Tous les étudiants des deux sites votent. Le 1er devient président, le 2e vice-président.</p>
+        <p class="texte-doux">Une promotion, c’est une classe : L1, L2, L3… jusqu’au master (B1 à M4 en médecine). Quand il y a une spécialisation, chacune forme sa propre promotion.</p>
+      </section>
+
+      <section class="carte">
+        <h2>Le code de vote</h2>
+        <p>Chaque étudiant inscrit reçoit <strong>un seul code</strong>, auprès d’un officiel, sur présentation de sa carte d’étudiant.</p>
+        <p>Exemple : <code>L2INF-LIN-K7M2QX</code> = promotion, faculté, site, puis une partie secrète tirée au hasard.</p>
+        <p>En cas de perte, l’officiel annule l’ancien code et en remet un nouveau. Les votes déjà faits restent comptés : on ne peut pas voter deux fois grâce au remplacement.</p>
+      </section>
+
+      <section class="carte">
+        <h2>Pendant le vote</h2>
+        <p>Le vote se fait en séance, aux horaires annoncés par les officiels. Un compte à rebours s’affiche ; à zéro, plus aucun vote n’est accepté. C’est l’horloge du serveur qui fait foi.</p>
+        <p>Un code ne vote qu’<strong>une fois par poste</strong>. Un code de Lingwala ne vote pas aux scrutins de promotion de N’djili, et inversement.</p>
+        <p>Pendant le vote, on voit la participation en direct, jamais les voix des candidats.</p>
+      </section>
+
+      <section class="carte">
+        <h2>Le secret du vote</h2>
+        <p><strong>La participation est enregistrée, le choix jamais.</strong> Le site sait qu’un étudiant a voté, pour l’empêcher de voter deux fois, mais pas pour qui : les voix sont comptées à part, sans aucun lien avec les codes.</p>
+        <p>Personne, même un officiel, ne voit les résultats avant la fin du vote. La liste « a voté / n’a pas voté » n’est consultable qu’après la fermeture.</p>
+      </section>
+
+      <section class="carte">
+        <h2>Les résultats</h2>
+        <p>Le superviseur dévoile les résultats à la fin du vote, pour tout le monde en même temps.</p>
+        <p><strong>Présidence :</strong> chaque site vote dans sa propre séance, puis les voix sont additionnées. Avant le vote, le superviseur annonce s’il dévoilera chaque site à la fin de sa séance, ou seulement le total.</p>
+      </section>
+
+      <section class="carte">
+        <h2>Cas particuliers</h2>
+        <p><strong>Égalité :</strong> on revote entre les seuls candidats à égalité, sans tirage au sort. Pour la présidence, l’égalité se constate sur le total des deux sites, et la commission décide de revoter.</p>
+        <p><strong>Candidat unique :</strong> il est élu d’office, sans vote.</p>
+        <p><strong>Aucun candidat :</strong> le poste reste vacant et un nouvel appel à candidatures est lancé.</p>
+      </section>
+    </div>
+
+    <section class="carte carte-simple section">
+      <h2>Les officiels</h2>
+      <p><strong>Superviseur :</strong> ajoute les candidats, ouvre et ferme les votes, dévoile les résultats. <strong>Distributeur :</strong> remet les codes. <strong>Observateur</strong> (commission, témoins des candidats) : suit tout, ne peut rien modifier.</p>
+      <p>Celui qui crée les codes n’est jamais celui qui contrôle le vote. Chaque action d’un officiel est notée dans un journal que personne ne peut effacer.</p>
+    </section>
+  </main>
+
+  <footer class="pied">Prototype de démonstration · Université Révérend Kim</footer>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Résultats – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/resultats.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <nav class="navigation" aria-label="Menu principal">
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Vue "liste" (sans ?scrutin=…) -->
+    <div id="vue-liste" class="cache">
+      <h1>Résultats</h1>
+      <p class="texte-doux">Les résultats apparaissent ici dès que le superviseur les dévoile. La page se met à jour toute seule.</p>
+      <section class="section">
+        <h2>En attente du dévoilement</h2>
+        <div id="en-attente" class="grille-3"></div>
+      </section>
+      <section class="section">
+        <h2>Résultats dévoilés</h2>
+        <div id="devoiles" class="grille-3"></div>
+      </section>
+    </div>
+
+    <!-- Vue "détail" d'un scrutin (?scrutin=…) -->
+    <div id="vue-detail" class="cache">
+      <p><a href="/resultats">← Tous les résultats</a></p>
+      <h1 id="titre-scrutin">Résultats</h1>
+      <p id="sous-titre" class="texte-doux"></p>
+      <div id="message"></div>
+      <div id="contenu-resultat"></div>
+    </div>
+  </main>
+
+  <footer class="pied">Les voix sont comptées sans aucun lien avec les codes : le choix de chacun reste secret.</footer>
+</body>
+</html>

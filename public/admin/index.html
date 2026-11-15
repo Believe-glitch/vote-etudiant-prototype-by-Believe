@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Espace officiels – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/admin/connexion.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype · Officiels</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="carte" aria-labelledby="titre-connexion">
+      <h1 id="titre-connexion">Espace officiels</h1>
+      <p class="texte-doux">Réservé au superviseur, aux distributeurs de codes et aux observateurs.</p>
+      <form id="formulaire-connexion" novalidate>
+        <div class="champ">
+          <label for="identifiant">Identifiant</label>
+          <input id="identifiant" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        </div>
+        <div class="champ">
+          <label for="mot-de-passe">Mot de passe</label>
+          <input id="mot-de-passe" type="password" autocomplete="current-password" required>
+        </div>
+        <div id="message"></div>
+        <button class="bouton bouton-accent" type="submit">Se connecter</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

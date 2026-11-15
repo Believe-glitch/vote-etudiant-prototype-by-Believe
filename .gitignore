@@ -1,0 +1,10 @@
+# Bibliothèques installées par « npm install » (on les réinstalle, on ne les envoie pas)
+node_modules/
+
+# Secrets : ne doivent JAMAIS partir sur GitHub
+.env
+
+# Fichiers de journal et fichiers du système
+*.log
+.DS_Store
+Thumbs.db

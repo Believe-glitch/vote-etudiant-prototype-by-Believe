@@ -1,0 +1,311 @@
+/* =====================================================================
+   Styles du site de vote étudiant
+   Pensés d'abord pour le téléphone : on agrandit ensuite pour l'ordinateur.
+   Polices du système (aucun téléchargement) : la page s'affiche vite,
+   même avec une connexion lente.
+   ===================================================================== */
+
+:root {
+  --encre: #14213d;          /* bleu nuit : titres, texte principal */
+  --encre-douce: #4a5568;    /* texte secondaire */
+  --papier: #f7f5ef;         /* fond de page */
+  --papier-2: #ece8dc;       /* fond alterné */
+  --carte: #fdfbf6;          /* fond des cartes */
+  --accent: #e09f3e;         /* ambre : boutons, barres */
+  --accent-fonce: #8a4f05;   /* ambre foncé : texte sur fond clair */
+  --ok: #1f7a4d;             /* vert : réussite */
+  --ok-fond: #e3f2e9;
+  --alerte: #b42318;         /* rouge : erreur */
+  --alerte-fond: #fdecea;
+  --trait: #d9d3c3;
+  --rayon: 14px;
+  --ombre: 0 1px 2px rgba(20, 33, 61, 0.06), 0 4px 16px rgba(20, 33, 61, 0.06);
+  --police: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --police-code: ui-monospace, "Cascadia Mono", "Consolas", "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--police);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--encre);
+  background: var(--papier);
+}
+
+a { color: var(--accent-fonce); }
+img { max-width: 100%; display: block; }
+h1, h2, h3 { line-height: 1.2; margin: 0 0 0.5em; }
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; }
+p { margin: 0 0 0.8em; }
+
+.cache { display: none !important; }
+.texte-doux { color: var(--encre-douce); }
+.petit { font-size: 0.9rem; }
+
+/* --- En-tête et navigation ------------------------------------------ */
+
+.entete {
+  background: var(--encre);
+  color: var(--papier);
+}
+.entete-contenu {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.2rem;
+}
+.logo {
+  color: var(--papier);
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: auto;
+}
+.logo-pastille {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: var(--encre);
+  display: grid; place-items: center; font-weight: 800;
+}
+.navigation { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; }
+.navigation a {
+  color: #c9d3e3; text-decoration: none; padding: 0.2rem 0;
+  border-bottom: 2px solid transparent;
+}
+.navigation a:hover, .navigation a[aria-current="page"] {
+  color: var(--papier); border-bottom-color: var(--accent);
+}
+
+/* --- Mise en page --------------------------------------------------- */
+
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+.section { margin-top: 2rem; }
+
+.grille-2 { display: grid; gap: 1rem; }
+.grille-3 { display: grid; gap: 1rem; }
+@media (min-width: 720px) {
+  .grille-2 { grid-template-columns: 1fr 1fr; }
+  .grille-3 { grid-template-columns: repeat(3, 1fr); }
+  h1 { font-size: 2.4rem; }
+}
+
+.carte {
+  background: var(--carte);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 1.2rem;
+  border-top: 5px solid var(--accent);
+}
+.carte-simple { border-top: none; }
+
+.bandeau {
+  background: var(--encre);
+  color: var(--papier);
+  border-radius: var(--rayon);
+  padding: 1.5rem;
+}
+.bandeau p { color: #c9d3e3; }
+
+.etape-numero {
+  font-size: 2rem; font-weight: 800; color: var(--accent-fonce); line-height: 1;
+}
+
+/* --- Formulaires et boutons ------------------------------------------ */
+
+label { display: block; font-weight: 600; margin-bottom: 0.3rem; }
+input[type="text"], input[type="password"], input[type="number"], input[type="search"], select, textarea {
+  width: 100%;
+  font: inherit;
+  padding: 0.7rem 0.8rem;
+  border: 2px solid var(--trait);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--encre);
+}
+input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.champ { margin-bottom: 0.9rem; }
+.champ-code {
+  font-family: var(--police-code);
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bouton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  font: inherit; font-weight: 700;
+  padding: 0.7rem 1.2rem;
+  border-radius: 10px;
+  border: 2px solid var(--encre);
+  background: var(--encre);
+  color: var(--papier);
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 46px;
+}
+.bouton:hover { filter: brightness(1.15); }
+.bouton:disabled { opacity: 0.5; cursor: not-allowed; }
+.bouton-accent { background: var(--accent); border-color: var(--accent); color: var(--encre); }
+.bouton-contour { background: transparent; color: var(--encre); }
+.bouton-danger { background: var(--alerte); border-color: var(--alerte); color: #fff; }
+.bouton-petit { padding: 0.35rem 0.7rem; min-height: 36px; font-size: 0.9rem; }
+.bouton-large { width: 100%; }
+.rangee-boutons { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+/* --- Messages --------------------------------------------------------- */
+
+.message {
+  padding: 0.8rem 1rem; border-radius: 10px; margin: 0.8rem 0;
+  border-left: 5px solid var(--encre-douce); background: var(--papier-2);
+}
+.message-erreur { border-left-color: var(--alerte); background: var(--alerte-fond); color: #7a1a12; }
+.message-ok { border-left-color: var(--ok); background: var(--ok-fond); color: #11502f; }
+
+.pastille {
+  display: inline-block; font-size: 0.8rem; font-weight: 700;
+  padding: 0.15rem 0.6rem; border-radius: 999px;
+  background: var(--papier-2); color: var(--encre-douce);
+}
+.pastille-ouvert { background: var(--ok-fond); color: var(--ok); }
+.pastille-ferme { background: var(--papier-2); color: var(--encre); }
+.pastille-devoile { background: var(--accent); color: var(--encre); }
+
+/* --- Candidats -------------------------------------------------------- */
+
+.liste-candidats { display: grid; gap: 0.7rem; }
+@media (min-width: 720px) { .liste-candidats { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); } }
+
+.candidat {
+  display: flex; align-items: center; gap: 0.8rem;
+  background: #fff; border: 2px solid var(--trait); border-radius: 12px;
+  padding: 0.7rem;
+}
+.candidat-nom { font-weight: 700; }
+.candidat-slogan { font-size: 0.9rem; color: var(--encre-douce); margin: 0; }
+
+.photo {
+  width: 64px; height: 64px; border-radius: 50%; flex: none;
+  object-fit: cover; background: var(--papier-2);
+}
+.photo-initiales {
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 1.3rem; color: var(--encre);
+  background: var(--papier-2);
+}
+.photo-grande { width: 96px; height: 96px; }
+
+/* Choix du candidat au moment du vote : toute la carte est cliquable. */
+.fieldset-nu { border: none; padding: 0; margin: 0; min-width: 0; }
+.choix input { position: absolute; opacity: 0; pointer-events: none; }
+.choix { position: relative; cursor: pointer; }
+.choix .candidat-nom, .choix .candidat-slogan { display: block; }
+.choix:has(input:checked) { border-color: var(--accent); background: #fff7ea; box-shadow: 0 0 0 3px rgba(224, 159, 62, 0.35); }
+.choix:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* --- Votes en cours et décompte ----------------------------------------- */
+
+.decompte {
+  font-family: var(--police-code);
+  font-size: 1.6rem; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.jauge {
+  height: 10px; border-radius: 999px; background: var(--papier-2); overflow: hidden;
+}
+.jauge-remplissage {
+  height: 100%; width: 0; background: var(--accent);
+  transition: width 0.6s ease;
+}
+
+/* --- Résultats --------------------------------------------------------- */
+
+.resultat-chiffre { font-size: 3rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.barres { display: grid; gap: 0.9rem; margin-top: 1rem; }
+.barre-ligne {
+  display: grid; grid-template-columns: 56px 1fr; gap: 0.8rem; align-items: center;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.barre-ligne.visible { opacity: 1; transform: none; }
+.barre-entete { display: flex; justify-content: space-between; gap: 0.5rem; font-weight: 700; }
+.barre-voix { font-variant-numeric: tabular-nums; }
+.barre-fond { height: 22px; border-radius: 8px; background: var(--papier-2); overflow: hidden; margin-top: 0.3rem; }
+.barre-remplissage { height: 100%; width: 0; background: var(--encre-douce); border-radius: 8px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.barre-ligne.gagnant .barre-remplissage { background: var(--accent); }
+.barre-ligne.gagnant .barre-fond { box-shadow: 0 0 0 2px var(--accent); }
+.badge-place {
+  display: inline-block; margin-left: 0.4rem; font-size: 0.8rem;
+  background: var(--accent); color: var(--encre); border-radius: 999px; padding: 0.1rem 0.6rem;
+  opacity: 0; transform: scale(0.6); transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.badge-place.visible { opacity: 1; transform: none; }
+.photo.petite { width: 56px; height: 56px; font-size: 1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .barre-ligne, .barre-remplissage, .badge-place, .jauge-remplissage { transition: none; }
+}
+
+/* --- Tableaux ----------------------------------------------------------- */
+
+.tableau-conteneur { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--papier-2); vertical-align: middle; }
+th { background: var(--encre); color: var(--papier); font-weight: 600; font-size: 0.9rem; }
+td.nombre, th.nombre { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td { font-weight: 700; background: var(--papier-2); }
+
+/* --- Fenêtres de dialogue ------------------------------------------------- */
+
+dialog {
+  border: none; border-radius: var(--rayon); padding: 1.4rem;
+  max-width: min(520px, 92vw); width: 100%;
+  box-shadow: 0 20px 60px rgba(20, 33, 61, 0.35);
+  color: var(--encre); background: var(--carte);
+}
+dialog::backdrop { background: rgba(20, 33, 61, 0.55); }
+.code-affiche {
+  font-family: var(--police-code); font-size: 2rem; font-weight: 800;
+  letter-spacing: 0.08em; text-align: center;
+  padding: 1rem; border-radius: 12px; background: var(--encre); color: var(--accent);
+  margin: 1rem 0; word-break: break-all;
+}
+
+/* --- Onglets (espace officiels) ------------------------------------------- */
+
+.onglets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.2rem; }
+.onglet {
+  font: inherit; font-weight: 700; cursor: pointer;
+  padding: 0.5rem 1rem; border-radius: 999px;
+  border: 2px solid var(--encre); background: transparent; color: var(--encre);
+}
+.onglet[aria-selected="true"] { background: var(--encre); color: var(--papier); }
+
+.scrutin-admin { margin-bottom: 1.2rem; }
+.seance-admin {
+  border: 2px dashed var(--trait); border-radius: 12px; padding: 0.8rem; margin-top: 0.8rem;
+  display: grid; gap: 0.5rem;
+}
+.ligne-flex { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: space-between; }
+.champ-duree { width: 90px !important; }
+
+.pied {
+  max-width: 1080px; margin: 0 auto; padding: 1.5rem 1rem; color: var(--encre-douce); font-size: 0.85rem;
+}

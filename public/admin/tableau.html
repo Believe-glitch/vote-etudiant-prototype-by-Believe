@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Tableau de bord – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/admin/tableau.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype · Officiels</a>
+      <span id="qui" class="petit"></span>
+      <button id="deconnexion" class="bouton bouton-accent bouton-petit" type="button">Se déconnecter</button>
+    </div>
+  </header>
+
+  <main>
+    <nav id="onglets" class="onglets" role="tablist" aria-label="Sections"></nav>
+    <div id="message-general"></div>
+    <div id="contenu"></div>
+  </main>
+
+  <!-- Fenêtre réutilisée pour les confirmations et les affichages ponctuels -->
+  <dialog id="dialogue">
+    <div id="dialogue-contenu"></div>
+  </dialog>
+</body>
+</html>

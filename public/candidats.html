@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidats – Vote étudiant prototype</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/candidats.js"></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <nav class="navigation" aria-label="Menu principal">
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>Les candidats</h1>
+    <p class="texte-doux">Choisissez une promotion pour voir ses candidats au poste de CP, de CPA et de secrétaire, ou consultez les candidats à la présidence de l’université.</p>
+
+    <div class="onglets" role="tablist">
+      <button class="onglet" role="tab" id="onglet-promotions" aria-selected="true" type="button">Par promotion</button>
+      <button class="onglet" role="tab" id="onglet-presidence" aria-selected="false" type="button">Présidence</button>
+    </div>
+
+    <form id="choix-promotion" class="carte carte-simple grille-3">
+      <div class="champ">
+        <label for="choix-site">Site</label>
+        <select id="choix-site"></select>
+      </div>
+      <div class="champ">
+        <label for="choix-faculte">Faculté</label>
+        <select id="choix-faculte"></select>
+      </div>
+      <div class="champ">
+        <label for="choix-promo">Promotion</label>
+        <select id="choix-promo"></select>
+      </div>
+    </form>
+
+    <div id="message"></div>
+    <div id="liste" class="section"></div>
+  </main>
+
+  <footer class="pied">Prototype de démonstration · Université Révérend Kim</footer>
+</body>
+</html>

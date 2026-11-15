@@ -1,0 +1,25 @@
+{
+  "name": "vote-etudiant-prototype",
+  "version": "0.1.0",
+  "description": "Prototype du site de vote étudiant de l'Université Révérend Kim (Lingwala et N'djili)",
+  "type": "module",
+  "main": "serveur.js",
+  "private": true,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "start": "node serveur.js",
+    "dev": "node --watch --env-file-if-exists=.env serveur.js",
+    "test": "node --env-file-if-exists=.env --test --test-concurrency=1 \"tests/**/*.test.js\"",
+    "creer-admin": "node --env-file-if-exists=.env scripts/creer-admin.js"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.5",
+    "@fastify/helmet": "^13.2.0",
+    "@fastify/static": "^10.1.11",
+    "argon2": "^0.45.2",
+    "fastify": "^5.12.8",
+    "postgres": "^3.4.9"
+  }
+}
