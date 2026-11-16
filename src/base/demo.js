@@ -50,29 +50,47 @@ export async function remplirStructureDemo(sql) {
         ('COM', 'Communication'), ('ECO', 'Sciences économiques'), ('SAN', 'Sciences de la santé')
       on conflict (sigle) do nothing`;
 
-    let numeroEtudiant = 0;
-    for (const [campus, faculte, niveau, filiere, effectif] of PROMOTIONS_DEMO) {
-      const [promotion] = await tx`
+    for (const [campus, faculte, niveau, filiere] of PROMOTIONS_DEMO) {
+      await tx`
         insert into promotion (campus_id, faculte_id, niveau, filiere)
         select c.id, f.id, ${niveau}, ${filiere}
         from campus c, faculte f
         where c.sigle = ${campus} and f.sigle = ${faculte}
-        returning id`;
-
-      for (let i = 0; i < effectif; i++) {
-        numeroEtudiant++;
-        // On combine noms et prénoms pour que chaque étudiant ait un nom différent
-        // (jusqu'à 24 × 24 = 576 étudiants sans doublon).
-        const nom = NOMS[numeroEtudiant % NOMS.length];
-        const tourDeListe = Math.floor(numeroEtudiant / NOMS.length);
-        const prenom = PRENOMS[(numeroEtudiant * 5 + tourDeListe) % PRENOMS.length];
-        const matricule = `2026-${campus}-${String(numeroEtudiant).padStart(4, '0')}`;
-        await tx`
-          insert into etudiant (promotion_id, matricule, nom, prenom)
-          values (${promotion.id}, ${matricule}, ${nom}, ${prenom})`;
-      }
+        on conflict do nothing`;
     }
+    await ajouterEtudiantsDemo(tx);
   });
+}
+
+// Ajoute les étudiants de démonstration dans leurs promotions. Sert aussi
+// au nettoyage « Tout remettre comme au départ » : on retrouve toujours
+// les mêmes noms et les mêmes matricules.
+export async function ajouterEtudiantsDemo(sql) {
+  let numeroEtudiant = 0;
+  for (const [campus, faculte, niveau, filiere, effectif] of PROMOTIONS_DEMO) {
+    const [promotion] = await sql`
+      select pr.id from promotion pr
+      join campus c on c.id = pr.campus_id
+      join faculte f on f.id = pr.faculte_id
+      where c.sigle = ${campus} and f.sigle = ${faculte} and pr.niveau = ${niveau} and pr.filiere = ${filiere}`;
+    if (!promotion) {
+      numeroEtudiant += effectif; // promotion absente : on garde la même numérotation
+      continue;
+    }
+    const lignes = [];
+    for (let i = 0; i < effectif; i++) {
+      numeroEtudiant++;
+      // On combine noms et prénoms pour que chaque étudiant ait un nom différent
+      // (jusqu'à 24 × 24 = 576 étudiants sans doublon).
+      const nom = NOMS[numeroEtudiant % NOMS.length];
+      const tourDeListe = Math.floor(numeroEtudiant / NOMS.length);
+      const prenom = PRENOMS[(numeroEtudiant * 5 + tourDeListe) % PRENOMS.length];
+      const matricule = `2026-${campus}-${String(numeroEtudiant).padStart(4, '0')}`;
+      lignes.push({ promotion_id: promotion.id, matricule, nom, prenom });
+    }
+    // Une seule demande à la base pour toute la promotion (plus rapide).
+    await sql`insert into etudiant ${sql(lignes, 'promotion_id', 'matricule', 'nom', 'prenom')}`;
+  }
 }
 
 // Ajoute des candidats pris parmi les étudiants de chaque promotion.
@@ -129,38 +147,56 @@ export async function ajouterCandidatsDemo(sql) {
 export async function ajouterCodesDemo(sql, cleSecrete) {
   const [deja] = await sql`select 1 from journal where action = 'donnees_demo_codes' limit 1`;
   if (deja) return;
-  const [distributeur] = await sql`select id from compte_admin where identifiant = 'distributeur'`;
-  if (!distributeur) return; // pas de compte de démonstration : on ne fait rien
-
   await sql.begin(async (tx) => {
-    const etudiants = await tx`
-      select e.id, pr.niveau, f.sigle as sigle_faculte, c.sigle as sigle_campus,
-        row_number() over (partition by e.promotion_id order by e.id desc) as rang_depuis_la_fin
-      from etudiant e
-      join promotion pr on pr.id = e.promotion_id
-      join faculte f on f.id = pr.faculte_id
-      join campus c on c.id = pr.campus_id
-      where not exists (select 1 from code_vote co where co.etudiant_id = e.id)
-      order by e.id`;
-    for (const e of etudiants) {
-      if (Number(e.rang_depuis_la_fin) <= 2) continue;
-      const prefixe = prefixeCode({ niveau: e.niveau, sigleFaculte: e.sigle_faculte, sigleCampus: e.sigle_campus });
-      const texte = `${prefixe}-${tirerPartieSecrete()}`;
-      await tx`
-        insert into code_vote (etudiant_id, prefixe, empreinte, cree_par, cree_le)
-        values (${e.id}, ${prefixe}, ${empreinteCode(texte, cleSecrete)}, ${distributeur.id},
-                now() - make_interval(mins => ${(e.id * 37) % 2880}))
-        on conflict do nothing`;
-    }
-    // Les étudiants de démonstration sont présentés comme inscrits par le distributeur.
-    await tx`
-      update etudiant e set inscrit_par = ${distributeur.id},
-        inscrit_le = coalesce((select min(cree_le) from code_vote where etudiant_id = e.id), now())
-      where inscrit_le is null`;
+    const nombre = await creerCodesDemo(tx, cleSecrete);
+    if (nombre === null) return; // pas de compte de démonstration : on ne fait rien
     await tx`
       insert into journal (admin_id, action, details)
-      values (null, 'donnees_demo_codes', ${tx.json({ codes: etudiants.length })})`;
+      values (null, 'donnees_demo_codes', ${tx.json({ codes: nombre })})`;
   });
+}
+
+// Crée les codes de démonstration (sans vérifier le journal). Renvoie le
+// nombre de codes créés, ou null s'il n'y a pas de compte « distributeur ».
+// Sert aussi au nettoyage « Tout remettre comme au départ ».
+export async function creerCodesDemo(tx, cleSecrete) {
+  const [distributeur] = await tx`select id from compte_admin where identifiant = 'distributeur'`;
+  if (!distributeur) return null;
+
+  const etudiants = await tx`
+    select e.id, pr.niveau, f.sigle as sigle_faculte, c.sigle as sigle_campus,
+      row_number() over (partition by e.promotion_id order by e.id desc) as rang_depuis_la_fin
+    from etudiant e
+    join promotion pr on pr.id = e.promotion_id
+    join faculte f on f.id = pr.faculte_id
+    join campus c on c.id = pr.campus_id
+    where not exists (select 1 from code_vote co where co.etudiant_id = e.id)
+    order by e.id`;
+  const lignes = [];
+  for (const e of etudiants) {
+    if (Number(e.rang_depuis_la_fin) <= 2) continue;
+    const prefixe = prefixeCode({ niveau: e.niveau, sigleFaculte: e.sigle_faculte, sigleCampus: e.sigle_campus });
+    const texte = `${prefixe}-${tirerPartieSecrete()}`;
+    lignes.push({
+      etudiant_id: e.id,
+      prefixe,
+      empreinte: empreinteCode(texte, cleSecrete),
+      cree_par: distributeur.id,
+      // Des heures de remise étalées sur les deux derniers jours, pour faire vrai.
+      cree_le: new Date(Date.now() - ((e.id * 37) % 2880) * 60_000),
+    });
+  }
+  if (lignes.length > 0) {
+    await tx`
+      insert into code_vote ${tx(lignes, 'etudiant_id', 'prefixe', 'empreinte', 'cree_par', 'cree_le')}
+      on conflict do nothing`;
+  }
+  // Les étudiants de démonstration sont présentés comme inscrits par le distributeur.
+  await tx`
+    update etudiant e set inscrit_par = ${distributeur.id},
+      inscrit_le = coalesce((select min(cree_le) from code_vote where etudiant_id = e.id), now())
+    where inscrit_le is null`;
+  return lignes.length;
 }
 
 // Portraits dessinés des candidats de démonstration (fichiers du dossier
@@ -180,10 +216,14 @@ export async function ajouterPhotosDemo(sql) {
     const fichier = parNom.get(nomDeFichier(candidat.nom));
     if (!fichier) continue;
     const donnees = await readFile(new URL(fichier, dossier));
-    await sql.begin(async (tx) => {
-      const [photo] = await tx`insert into photo (type_mime, donnees) values ('image/webp', ${donnees}) returning id`;
-      await tx`update candidat set photo_id = ${photo.id} where id = ${candidat.id} and photo_id is null`;
-    });
+    // Une seule instruction : la photo est enregistrée et rattachée au
+    // candidat en même temps (tout ou rien).
+    await sql`
+      with nouvelle as (
+        insert into photo (type_mime, donnees) values ('image/webp', ${donnees}) returning id
+      )
+      update candidat set photo_id = (select id from nouvelle)
+      where id = ${candidat.id} and photo_id is null`;
   }
 }
 

@@ -40,7 +40,7 @@ export async function rechercherEtudiants(sql, { recherche, promotionId }) {
     select e.id, e.matricule, e.nom, e.postnom, e.prenom,
       pr.niveau, pr.filiere, f.nom as faculte_nom, c.nom as campus_nom,
       (select cree_le from code_vote where etudiant_id = e.id and statut = 'actif') as code_remis_le,
-      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule') as remplacements
+      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule' and not par_nettoyage) as remplacements
     from etudiant e
     join promotion pr on pr.id = e.promotion_id
     join faculte f on f.id = pr.faculte_id
@@ -95,7 +95,7 @@ export async function listerPromotion(sql, promotionId) {
     select e.id, e.matricule, e.nom, e.postnom, e.prenom, e.inscrit_le,
       a.nom_complet as inscrit_par,
       (select cree_le from code_vote where etudiant_id = e.id and statut = 'actif') as code_remis_le,
-      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule') as remplacements
+      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule' and not par_nettoyage) as remplacements
     from etudiant e
     left join compte_admin a on a.id = e.inscrit_par
     where e.promotion_id = ${promotionId}`;
@@ -204,11 +204,9 @@ export async function remplacerCode(sql, adminId, etudiantId, motif, cleSecrete)
     // L'ancien code ne doit plus pouvoir servir, même s'il était connecté.
     await tx`delete from session where type = 'etudiant' and reference_id = ${ancien.id}`;
 
+    // Les votes déjà faits avec l'ancien code comptent pour le nouveau
+    // (voir insererNouveauCode).
     const nouveau = await insererNouveauCode(tx, etudiant, adminId, cleSecrete);
-    // Les votes déjà faits avec l'ancien code comptent pour le nouveau.
-    await tx`
-      insert into participation (code_id, scrutin_id)
-      select ${nouveau.id}, scrutin_id from participation where code_id = ${ancien.id}`;
 
     await noterAuJournal(tx, adminId, 'code_remplace', {
       etudiantId, nom: etudiant.nom_complet, matricule: etudiant.matricule,
@@ -247,7 +245,19 @@ async function insererNouveauCode(tx, etudiant, adminId, cleSecrete) {
       values (${etudiant.id}, ${prefixe}, ${empreinteCode(texte, cleSecrete)}, ${adminId})
       on conflict do nothing
       returning id`;
-    if (ligne) return { id: ligne.id, texte };
+    if (ligne) {
+      // Les votes déjà faits avec un ancien code de cet étudiant (perdu, ou
+      // annulé par un nettoyage) comptent pour le nouveau : il ne peut pas
+      // voter deux fois pour le même poste.
+      await tx`
+        insert into participation (code_id, scrutin_id)
+        select distinct ${ligne.id}::int, pa.scrutin_id
+        from participation pa
+        join code_vote co on co.id = pa.code_id
+        where co.etudiant_id = ${etudiant.id} and co.id <> ${ligne.id}
+        on conflict do nothing`;
+      return { id: ligne.id, texte };
+    }
 
     // Rien n'a été inséré : soit l'étudiant a déjà un code, soit le code tiré existe déjà.
     const [actif] = await tx`
@@ -264,7 +274,7 @@ export async function statistiquesCodes(sql) {
     select pr.id, pr.niveau, pr.filiere, f.nom as faculte_nom, c.nom as campus_nom,
       count(distinct e.id)::int as inscrits,
       count(co.id) filter (where co.statut = 'actif')::int as codes_actifs,
-      count(co.id) filter (where co.statut = 'annule')::int as codes_remplaces
+      count(co.id) filter (where co.statut = 'annule' and not co.par_nettoyage)::int as codes_remplaces
     from promotion pr
     join faculte f on f.id = pr.faculte_id
     join campus c on c.id = pr.campus_id

@@ -19,6 +19,7 @@ import { routesEtudiant } from './routes/etudiant.js';
 import { routesAdmin } from './routes/admin.js';
 import { routesAdminCodes } from './routes/admin-codes.js';
 import { routesAdminScrutins } from './routes/admin-scrutins.js';
+import { routesAdminNettoyage } from './routes/admin-nettoyage.js';
 
 const DOSSIER_PAGES = fileURLToPath(new URL('../public', import.meta.url));
 
@@ -141,6 +142,7 @@ export async function construireApplication({ config, sql, journalisation = true
   await app.register(routesAdmin, { prefix: '/api/admin' });
   await app.register(routesAdminCodes, { prefix: '/api/admin' });
   await app.register(routesAdminScrutins, { prefix: '/api/admin' });
+  await app.register(routesAdminNettoyage, { prefix: '/api/admin' });
 
   // --- Tâches régulières --------------------------------------------------
 

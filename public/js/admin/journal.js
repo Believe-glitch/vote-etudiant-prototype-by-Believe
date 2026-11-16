@@ -21,6 +21,11 @@ const ACTIONS = {
   resultats_devoiles: 'Résultats dévoilés',
   elu_d_office: 'Candidat élu d’office',
   second_tour_cree: 'Second tour créé',
+  nettoyage_votes_scrutin: 'Nettoyage : votes d’un scrutin effacés',
+  nettoyage_tous_les_votes: 'Nettoyage : tous les votes effacés',
+  nettoyage_codes: 'Nettoyage : codes annulés',
+  nettoyage_sessions: 'Nettoyage : tout le monde déconnecté',
+  nettoyage_complet: 'Nettoyage : tout remis comme au départ',
 };
 
 // Résumé lisible des détails (sans jargon technique).
@@ -34,6 +39,12 @@ function resume(details, nomsSites) {
   if (details.minutes) morceaux.push(`+${details.minutes} min`);
   if (details.mode) morceaux.push(details.mode === 'total' ? 'total seulement' : 'par site');
   if (details.scrutinId) morceaux.push(`scrutin n° ${details.scrutinId}`);
+  // Résumé d'un nettoyage
+  if (details.voix !== undefined) morceaux.push(`${details.voix} voix effacée${details.voix > 1 ? 's' : ''}`);
+  if (details.secondsTours) morceaux.push(`${details.secondsTours} second${details.secondsTours > 1 ? 's' : ''} tour${details.secondsTours > 1 ? 's' : ''} supprimé${details.secondsTours > 1 ? 's' : ''}`);
+  if (details.codes !== undefined) morceaux.push(`${details.codes} code${details.codes > 1 ? 's' : ''}`);
+  if (details.sessions !== undefined) morceaux.push(`${details.sessions} session${details.sessions > 1 ? 's' : ''} fermée${details.sessions > 1 ? 's' : ''}`);
+  if (details.etudiants !== undefined) morceaux.push(`${details.etudiants} étudiants, ${details.candidats} candidats`);
   return morceaux.join(' · ');
 }
 
