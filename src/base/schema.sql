@@ -41,16 +41,23 @@ create table if not exists promotion (
   unique (campus_id, faculte_id, niveau, filiere)
 );
 
--- La liste officielle des inscrits, fournie par l'université.
+-- La liste des étudiants de chaque promotion. Un étudiant y entre de deux
+-- façons : importé d'une liste de l'université, ou inscrit par un
+-- distributeur au moment où il vient chercher son code.
 create table if not exists etudiant (
   id            serial primary key,
   promotion_id  int  not null references promotion(id),
-  matricule     text not null unique,
+  matricule     text unique,                 -- facultatif : tout le monde n'en a pas
   nom           text not null,
   postnom       text not null default '',
   prenom        text not null default ''
 );
 create index if not exists etudiant_par_promotion on etudiant (promotion_id);
+
+-- Mises à jour d'une base créée avec une version précédente du site.
+-- ("if not exists" : sans effet si c'est déjà fait.)
+alter table etudiant alter column matricule drop not null;
+alter table etudiant add column if not exists inscrit_le timestamptz;   -- vide : importé d'une liste
 
 
 -- ---------------------------------------------------------------------
@@ -69,6 +76,9 @@ create table if not exists compte_admin (
   role                text not null check (role in ('superviseur', 'distributeur', 'observateur')),
   actif               boolean not null default true
 );
+
+-- Le distributeur qui a inscrit l'étudiant (vide : importé d'une liste).
+alter table etudiant add column if not exists inscrit_par int references compte_admin(id);
 
 
 -- ---------------------------------------------------------------------

@@ -2,13 +2,14 @@
 //   1. créer les tables qui manquent (schema.sql) ;
 //   2. remplir une base vide avec la démonstration (si DONNEES_DEMO=oui) ;
 //   3. créer les scrutins et les séances de chaque promotion ;
-//   4. créer les comptes admin de démonstration (si DEMO_MOT_DE_PASSE est défini).
+//   4. créer les comptes admin de démonstration (si DEMO_MOT_DE_PASSE est défini) ;
+//   5. démonstration : portraits dessinés des candidats, codes déjà remis.
 //
 // Tout est prévu pour pouvoir être relancé sans rien casser ni dupliquer.
 
 import { readFile } from 'node:fs/promises';
 import argon2 from 'argon2';
-import { remplirStructureDemo, ajouterCandidatsDemo } from './demo.js';
+import { remplirStructureDemo, ajouterCandidatsDemo, ajouterCodesDemo, ajouterPhotosDemo } from './demo.js';
 
 export async function preparerBase(sql, config) {
   const schema = await readFile(new URL('./schema.sql', import.meta.url), 'utf8');
@@ -25,6 +26,10 @@ export async function preparerBase(sql, config) {
 
   if (config.donneesDemo) await ajouterCandidatsDemo(sql);
   if (config.motDePasseDemo) await creerComptesDemo(sql, config.motDePasseDemo);
+  if (config.donneesDemo) {
+    await ajouterPhotosDemo(sql);
+    if (config.codesDemo !== false) await ajouterCodesDemo(sql, config.cleSecreteCodes);
+  }
 }
 
 // Chaque promotion a trois scrutins (CP, CPA, secrétaire) et l'université

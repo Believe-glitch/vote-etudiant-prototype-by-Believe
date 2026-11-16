@@ -1,18 +1,19 @@
 // Tableau de bord des officiels. Les onglets affichés dépendent du rôle :
-//   distributeur : Remise des codes, Statistiques
-//   superviseur  : Votes, Statistiques, Journal
-//   observateur  : Votes (lecture seule), Statistiques, Journal
+//   distributeur : Inscription et codes, Statistiques
+//   superviseur  : Votes, Listes des inscrits, Statistiques, Journal
+//   observateur  : les mêmes, en lecture seule
 // Le serveur vérifie de toute façon le rôle à chaque action.
 
 import { api, e, afficherMessage, lancerDecomptes } from '../commun.js';
-import { afficherCodes } from './codes.js';
+import { afficherListes } from './codes.js';
 import { afficherVotes } from './votes.js';
 import { afficherStatistiques } from './statistiques.js';
 import { afficherJournal } from './journal.js';
 
 const ONGLETS = {
-  codes: { titre: 'Remise des codes', roles: ['distributeur'], afficher: afficherCodes },
+  codes: { titre: 'Inscription et codes', roles: ['distributeur'], afficher: afficherListes },
   votes: { titre: 'Votes', roles: ['superviseur', 'observateur'], afficher: afficherVotes },
+  listes: { titre: 'Listes des inscrits', roles: ['superviseur', 'observateur'], afficher: afficherListes },
   statistiques: { titre: 'Statistiques', roles: ['distributeur', 'superviseur', 'observateur'], afficher: afficherStatistiques },
   journal: { titre: 'Journal', roles: ['superviseur', 'observateur'], afficher: afficherJournal },
 };

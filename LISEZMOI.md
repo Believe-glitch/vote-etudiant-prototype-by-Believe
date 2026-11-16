@@ -1,6 +1,6 @@
-# Vote étudiant prototype – Université Révérend Kim
+# URKIMeVote – Université Révérend Kim
 
-Prototype du site de vote pour les élections étudiantes de Lingwala et N’djili :
+**URKIMeVote** est le prototype du site de vote pour les élections étudiantes de Lingwala et N’djili :
 CP, CPA et secrétaire de chaque promotion, président et vice-président de l’université.
 
 Le circuit de travail : **VS Code → GitHub → Render → Neon**.
@@ -82,9 +82,10 @@ Ouvre trois fenêtres : une pour le **distributeur**, une pour le **superviseur*
 **téléphone** pour l’étudiant. Une fenêtre de navigation privée permet d’être connecté
 à deux comptes en même temps.
 
-1. **Distributeur** → onglet *Remise des codes* → choisis la promotion
-   « L2 Sciences informatiques · Lingwala » → *Chercher* → *Générer le code*.
-   Le code s’affiche **une seule fois** : note-le.
+1. **Distributeur** → onglet *Inscription et codes* → choisis Lingwala, Sciences informatiques, L2.
+   Tape un nom (ex. « Matondo », postnom « Lusala », prénom « Jonas ») → *Inscrire et remettre le code*.
+   L’étudiant apparaît dans la liste de sa promotion, et son code s’affiche
+   **une seule fois** : note-le. Le bouton *Imprimer la liste* donne une liste d’émargement.
 2. **Superviseur** → onglet *Votes* → même promotion → sur le CP, durée **3** minutes →
    *Ouvrir le vote*.
 3. **Visiteur** (sur le vidéoprojecteur) → *Résultats* → clique sur le CP en cours :
@@ -146,7 +147,7 @@ Render met alors le site en ligne à jour tout seul.
    | `DEMO_MOT_DE_PASSE` | le même mot de passe que dans ton `.env` |
 
 4. **Create Web Service**. Après quelques minutes, Render affiche l’adresse du site,
-   du genre `https://vote-etudiant-prototype.onrender.com`.
+   du genre `https://urkim-evote.onrender.com`.
 
 Le service gratuit **s’endort après 15 minutes sans visite** et met environ une minute à se
 réveiller. Ouvre le site quelques minutes avant de le montrer. Pour le vrai scrutin, prends
@@ -218,6 +219,8 @@ vote-etudiant-prototype/
 │   ├── regles.html, apropos.html
 │   ├── admin/                 Espace officiels
 │   ├── css/style.css          L’apparence de tout le site
+│   ├── images/                L’écusson de l’université et l’icône du site
+│   ├── polices/               La police des titres (Poppins)
 │   └── js/                    Le JavaScript de chaque page
 ├── scripts/creer-admin.js     Création d’un compte officiel
 └── tests/                     Les tests automatiques
@@ -261,7 +264,44 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 
 ---
 
-## 9. Sécurité : ce qui est déjà en place
+## 9. La remise des codes
+
+- Le distributeur choisit le site, la faculté et la promotion, puis tape le **nom** de l’étudiant
+  (postnom ou prénom obligatoire, matricule facultatif). L’étudiant est ajouté à la **liste de sa
+  promotion** et reçoit son code, affiché une seule fois.
+- Si un nom identique existe déjà dans la promotion, le site prévient : soit c’est la même personne
+  (utiliser *Remplacer (perdu)*), soit c’est un homonyme (confirmer).
+- La liste se filtre par nom et s’imprime (liste d’émargement avec une colonne *Signature*).
+  **Les codes n’apparaissent jamais sur la liste** : une liste avec les codes donnerait le droit
+  de vote de toute la promotion à celui qui la trouve.
+- Le superviseur et l’observateur consultent les listes (onglet *Listes des inscrits*), sans pouvoir les modifier.
+- En démonstration, la plupart des étudiants fictifs ont déjà reçu leur code ; les deux derniers
+  de chaque promotion pas encore. Les candidats fictifs ont un portrait dessiné (dossier
+  `src/base/photos-demo`) ; un vrai candidat reçoit sa vraie photo depuis l’onglet *Votes*.
+
+---
+
+## 10. L’identité visuelle (nom, logo, couleurs)
+
+- **Le nom** s’écrit `URKIMeVote` : le « e » toujours en minuscule.
+- **Le logo** est écrit directement dans l’en-tête de chaque page (`<span class="logo-mot">`) :
+  les lettres sont du texte, et le V est un petit dessin (une coche qui sort d’un téléphone).
+  Son apparence se règle dans `public/css/style.css`, section « Le logo URKIMeVote ».
+  Sur un fond clair, ajoute la classe `sur-clair` : l’or devient bleu roi.
+- **L’icône de l’onglet** est `public/favicon.svg` ; celle des téléphones, `public/images/icone-180.png`.
+- **Le logo en image**, pour tes diapositives et tes documents : `public/images/logo-urkimevote-fond-fonce.png`
+  (lettres blanches, à poser sur un fond bleu) et `logo-urkimevote-fond-clair.png` (lettres bleues, pour
+  un fond blanc). Leur fond est transparent.
+- **Les couleurs** sont des variables, tout en haut de `public/css/style.css` :
+  `--encre` (bleu marine), `--royal` (bleu roi), `--accent` (or). Change une valeur, tout le site suit.
+- **L’écusson de l’université** est dans `public/images/` (deux tailles). Il est affiché sur la page
+  d’accueil, en bas des pages et sur la connexion des officiels. Pour le vrai scrutin, demande à
+  l’université l’autorisation d’utiliser son écusson.
+- **La police des titres** (Poppins) est dans `public/polices/`, avec sa licence libre.
+
+---
+
+## 11. Sécurité : ce qui est déjà en place
 
 - Le code complet n’est **jamais** rangé dans la base : seulement son empreinte (HMAC-SHA-256).
 - Les règles du vote sont vérifiées par le **serveur**, et les plus importantes par la **base** elle-même.
@@ -274,7 +314,7 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 ### Avant un vrai scrutin
 
 1. Une **base Neon neuve**, avec `DONNEES_DEMO=non` et sans `DEMO_MOT_DE_PASSE`.
-2. Importer les **listes officielles** des inscrits.
+2. Préparer les listes : soit importer les inscrits fournis par l’université, soit inscrire chaque étudiant au moment où il vient chercher son code.
 3. Créer les **vrais comptes** officiels avec `npm run creer-admin`, avec des mots de passe solides.
 4. Un **nouveau** `CODE_SECRET`, gardé secret.
 5. Un hébergement **sans mise en veille** (offre payante ou serveur de l’université).
@@ -283,7 +323,7 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 
 ---
 
-## 10. En cas de problème
+## 12. En cas de problème
 
 | Message | Solution |
 |---|---|

@@ -1,8 +1,11 @@
 // Données de démonstration : de faux étudiants et de faux candidats,
 // pour montrer le site sans utiliser de vraies listes.
 //
-// Elles ne sont ajoutées que si DONNEES_DEMO=oui ET que la base est vide.
-// Pour le vrai scrutin, on remplacera tout ça par les listes officielles.
+// Elles ne sont ajoutées que si DONNEES_DEMO=oui. Pour le vrai scrutin,
+// on met DONNEES_DEMO=non et on repart d'une base vide.
+
+import { readdir, readFile } from 'node:fs/promises';
+import { prefixeCode, tirerPartieSecrete, empreinteCode } from '../services/codes.js';
 
 const NOMS = [
   'Kalonji', 'Mbuyi', 'Ilunga', 'Tshibangu', 'Kabeya', 'Mukendi', 'Ngoy', 'Banza',
@@ -116,4 +119,76 @@ export async function ajouterCandidatsDemo(sql) {
         values (${scrutin.id}, ${`${etudiant.prenom} ${etudiant.nom}`}, ${slogan})`;
     }
   }
+}
+
+// Les étudiants de démonstration ont déjà « récupéré » leur code auprès du
+// distributeur : on leur crée un code (que personne ne connaît, c'est une
+// démonstration). Les deux derniers de chaque promotion n'en ont pas encore,
+// pour montrer aussi ce cas. Cela ne se fait qu'une seule fois : une ligne
+// du journal le note.
+export async function ajouterCodesDemo(sql, cleSecrete) {
+  const [deja] = await sql`select 1 from journal where action = 'donnees_demo_codes' limit 1`;
+  if (deja) return;
+  const [distributeur] = await sql`select id from compte_admin where identifiant = 'distributeur'`;
+  if (!distributeur) return; // pas de compte de démonstration : on ne fait rien
+
+  await sql.begin(async (tx) => {
+    const etudiants = await tx`
+      select e.id, pr.niveau, f.sigle as sigle_faculte, c.sigle as sigle_campus,
+        row_number() over (partition by e.promotion_id order by e.id desc) as rang_depuis_la_fin
+      from etudiant e
+      join promotion pr on pr.id = e.promotion_id
+      join faculte f on f.id = pr.faculte_id
+      join campus c on c.id = pr.campus_id
+      where not exists (select 1 from code_vote co where co.etudiant_id = e.id)
+      order by e.id`;
+    for (const e of etudiants) {
+      if (Number(e.rang_depuis_la_fin) <= 2) continue;
+      const prefixe = prefixeCode({ niveau: e.niveau, sigleFaculte: e.sigle_faculte, sigleCampus: e.sigle_campus });
+      const texte = `${prefixe}-${tirerPartieSecrete()}`;
+      await tx`
+        insert into code_vote (etudiant_id, prefixe, empreinte, cree_par, cree_le)
+        values (${e.id}, ${prefixe}, ${empreinteCode(texte, cleSecrete)}, ${distributeur.id},
+                now() - make_interval(mins => ${(e.id * 37) % 2880}))
+        on conflict do nothing`;
+    }
+    // Les étudiants de démonstration sont présentés comme inscrits par le distributeur.
+    await tx`
+      update etudiant e set inscrit_par = ${distributeur.id},
+        inscrit_le = coalesce((select min(cree_le) from code_vote where etudiant_id = e.id), now())
+      where inscrit_le is null`;
+    await tx`
+      insert into journal (admin_id, action, details)
+      values (null, 'donnees_demo_codes', ${tx.json({ codes: etudiants.length })})`;
+  });
+}
+
+// Portraits dessinés des candidats de démonstration (fichiers du dossier
+// photos-demo, nommés d'après le nom du candidat). Seuls les candidats
+// sans photo en reçoivent une : une vraie photo n'est jamais remplacée.
+export async function ajouterPhotosDemo(sql) {
+  const dossier = new URL('./photos-demo/', import.meta.url);
+  let fichiers;
+  try {
+    fichiers = (await readdir(dossier)).filter((f) => f.endsWith('.webp'));
+  } catch {
+    return;
+  }
+  const parNom = new Map(fichiers.map((f) => [f.replace(/\.webp$/, ''), f]));
+  const candidats = await sql`select id, nom from candidat where photo_id is null`;
+  for (const candidat of candidats) {
+    const fichier = parNom.get(nomDeFichier(candidat.nom));
+    if (!fichier) continue;
+    const donnees = await readFile(new URL(fichier, dossier));
+    await sql.begin(async (tx) => {
+      const [photo] = await tx`insert into photo (type_mime, donnees) values ('image/webp', ${donnees}) returning id`;
+      await tx`update candidat set photo_id = ${photo.id} where id = ${candidat.id} and photo_id is null`;
+    });
+  }
+}
+
+// « Grace Kalonji » → « grace-kalonji » (sans accents ni espaces).
+export function nomDeFichier(nom) {
+  return String(nom).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }

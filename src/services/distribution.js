@@ -1,9 +1,18 @@
 // La remise des codes aux étudiants (réservée aux distributeurs).
 //
+// Comment ça se passe devant l'officiel :
+//   1. le distributeur choisit le site, la faculté et la promotion ;
+//   2. il tape le nom de l'étudiant (le matricule est facultatif) ;
+//   3. l'étudiant est ajouté à la liste de sa promotion, et son code est
+//      créé et affiché UNE seule fois.
+//
 // Règles :
-//   - seul un étudiant de la liste officielle peut recevoir un code ;
 //   - un seul code actif par étudiant (la base l'interdit aussi) ;
-//   - le code n'est montré qu'une fois, au moment où il est créé ;
+//   - si un étudiant du même nom est déjà inscrit dans la promotion, le site
+//     prévient : le distributeur doit confirmer qu'il s'agit d'une autre
+//     personne (sinon, c'est un remplacement de code perdu) ;
+//   - le code n'est jamais gardé en clair : la liste imprimée montre qui a
+//     reçu un code, pas le code lui-même ;
 //   - en cas de perte, l'ancien code est annulé et un nouveau est créé.
 //     Le nouveau code "hérite" des votes déjà faits avec l'ancien :
 //     l'étudiant ne peut donc pas voter deux fois grâce au remplacement.
@@ -43,11 +52,125 @@ export async function rechercherEtudiants(sql, { recherche, promotionId }) {
   return lignes.map((l) => ({
     id: l.id,
     matricule: l.matricule,
-    nomComplet: [l.nom, l.postnom, l.prenom].filter(Boolean).join(' '),
+    nomComplet: nomComplet(l),
     promotion: libellePromotion(l),
     codeRemisLe: l.code_remis_le,
     remplacements: l.remplacements,
   }));
+}
+
+// --- Les noms -------------------------------------------------------------
+
+// Met un nom au propre : espaces en trop retirés.
+export function nettoyerNom(texte) {
+  return String(texte ?? '').trim().replace(/\s+/g, ' ');
+}
+
+// Version "pour comparer" d'un nom : minuscules, sans accents ni tirets.
+// « Kabéya-Mukendi » et « kabeya mukendi » donnent la même chose.
+export function nomPourComparer(texte) {
+  return nettoyerNom(texte)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function nomComplet(e) {
+  return [e.nom, e.postnom, e.prenom].filter(Boolean).join(' ');
+}
+
+// --- La liste d'une promotion ----------------------------------------------
+
+// Tous les étudiants d'une promotion, dans l'ordre alphabétique, avec l'état
+// de leur code. Le code lui-même n'y est jamais : il n'est gardé nulle part.
+export async function listerPromotion(sql, promotionId) {
+  const [promotion] = await sql`
+    select pr.id, pr.campus_id, pr.niveau, pr.filiere, f.nom as faculte_nom, c.nom as campus_nom
+    from promotion pr
+    join faculte f on f.id = pr.faculte_id
+    join campus c on c.id = pr.campus_id
+    where pr.id = ${promotionId}`;
+  if (!promotion) throw new ErreurMetier('Promotion introuvable.', 404);
+
+  const lignes = await sql`
+    select e.id, e.matricule, e.nom, e.postnom, e.prenom, e.inscrit_le,
+      a.nom_complet as inscrit_par,
+      (select cree_le from code_vote where etudiant_id = e.id and statut = 'actif') as code_remis_le,
+      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule') as remplacements
+    from etudiant e
+    left join compte_admin a on a.id = e.inscrit_par
+    where e.promotion_id = ${promotionId}`;
+
+  const etudiants = lignes
+    .map((l) => ({
+      id: l.id,
+      matricule: l.matricule,
+      nom: l.nom,
+      postnom: l.postnom,
+      prenom: l.prenom,
+      nomComplet: nomComplet(l),
+      inscritLe: l.inscrit_le,
+      inscritPar: l.inscrit_par,
+      codeRemisLe: l.code_remis_le,
+      remplacements: l.remplacements,
+    }))
+    .sort((a, b) => a.nomComplet.localeCompare(b.nomComplet, 'fr', { sensitivity: 'base' }))
+    .map((e, index) => ({ numero: index + 1, ...e }));
+
+  return {
+    promotion: { id: promotion.id, campusId: promotion.campus_id, libelle: libellePromotion(promotion) },
+    inscrits: etudiants.length,
+    codesRemis: etudiants.filter((e) => e.codeRemisLe).length,
+    etudiants,
+  };
+}
+
+// --- Inscription d'un étudiant et remise de son code -----------------------
+
+export async function inscrireEtRemettreCode(sql, adminId, promotionId, identite, cleSecrete) {
+  const nom = nettoyerNom(identite.nom);
+  const postnom = nettoyerNom(identite.postnom);
+  const prenom = nettoyerNom(identite.prenom);
+  const matricule = nettoyerNom(identite.matricule) || null;
+  if (nom.length < 2) throw new ErreurMetier('Indiquez au moins le nom de l’étudiant.');
+  if (!postnom && !prenom) throw new ErreurMetier('Indiquez aussi le postnom ou le prénom, pour bien distinguer les étudiants.');
+
+  return sql.begin(async (tx) => {
+    const [promotion] = await tx`select id from promotion where id = ${promotionId}`;
+    if (!promotion) throw new ErreurMetier('Promotion introuvable.', 404);
+
+    // Un étudiant du même nom est-il déjà inscrit dans cette promotion ?
+    if (!identite.confirmerHomonyme) {
+      const existants = await tx`
+        select nom, postnom, prenom from etudiant where promotion_id = ${promotionId}`;
+      const cherche = nomPourComparer(`${nom} ${postnom} ${prenom}`);
+      const nomPrenom = nomPourComparer(`${nom} ${prenom}`);
+      const double = existants.find((e) =>
+        nomPourComparer(nomComplet(e)) === cherche ||
+        (prenom && nomPourComparer(`${e.nom} ${e.prenom}`) === nomPrenom));
+      if (double) {
+        throw new ErreurMetier(
+          `« ${nomComplet(double)} » est déjà inscrit dans cette promotion. S’il a perdu son code, utilisez « Remplacer » dans la liste. Si c’est bien une autre personne, confirmez.`,
+          409, { homonyme: true });
+      }
+    }
+
+    if (matricule) {
+      const [pris] = await tx`select id from etudiant where matricule = ${matricule}`;
+      if (pris) throw new ErreurMetier('Ce matricule est déjà utilisé par un autre étudiant.', 409);
+    }
+
+    const [etudiant] = await tx`
+      insert into etudiant (promotion_id, matricule, nom, postnom, prenom, inscrit_le, inscrit_par)
+      values (${promotionId}, ${matricule}, ${nom}, ${postnom}, ${prenom}, now(), ${adminId})
+      returning id`;
+    const fiche = await lireEtudiantPourCode(tx, etudiant.id);
+    const code = await insererNouveauCode(tx, fiche, adminId, cleSecrete);
+    await noterAuJournal(tx, adminId, 'etudiant_inscrit_code_remis', {
+      etudiantId: etudiant.id, nom: nomComplet({ nom, postnom, prenom }),
+      promotionId, campusId: fiche.campus_id,
+    });
+    return { etudiantId: etudiant.id, nomComplet: nomComplet({ nom, postnom, prenom }), code: code.texte };
+  });
 }
 
 // Crée un code pour un étudiant qui n'en a pas encore.
@@ -56,7 +179,9 @@ export async function genererCode(sql, adminId, etudiantId, cleSecrete) {
     const etudiant = await lireEtudiantPourCode(tx, etudiantId);
     const code = await insererNouveauCode(tx, etudiant, adminId, cleSecrete);
     if (!code) throw new ErreurMetier('Cet étudiant a déjà un code. En cas de perte, utilisez « Remplacer ».', 409);
-    await noterAuJournal(tx, adminId, 'code_remis', { etudiantId, matricule: etudiant.matricule });
+    await noterAuJournal(tx, adminId, 'code_remis', {
+      etudiantId, nom: etudiant.nom_complet, matricule: etudiant.matricule, campusId: etudiant.campus_id,
+    });
     return code.texte;
   });
 }
@@ -86,7 +211,8 @@ export async function remplacerCode(sql, adminId, etudiantId, motif, cleSecrete)
       select ${nouveau.id}, scrutin_id from participation where code_id = ${ancien.id}`;
 
     await noterAuJournal(tx, adminId, 'code_remplace', {
-      etudiantId, matricule: etudiant.matricule, motif: motifPropre,
+      etudiantId, nom: etudiant.nom_complet, matricule: etudiant.matricule,
+      campusId: etudiant.campus_id, motif: motifPropre,
     });
     return nouveau.texte;
   });
@@ -94,14 +220,15 @@ export async function remplacerCode(sql, adminId, etudiantId, motif, cleSecrete)
 
 async function lireEtudiantPourCode(tx, etudiantId) {
   const [etudiant] = await tx`
-    select e.id, e.matricule, pr.niveau, f.sigle as sigle_faculte, c.sigle as sigle_campus
+    select e.id, e.matricule, e.nom, e.postnom, e.prenom, pr.niveau, pr.campus_id,
+      f.sigle as sigle_faculte, c.sigle as sigle_campus
     from etudiant e
     join promotion pr on pr.id = e.promotion_id
     join faculte f on f.id = pr.faculte_id
     join campus c on c.id = pr.campus_id
     where e.id = ${etudiantId}`;
-  if (!etudiant) throw new ErreurMetier('Étudiant introuvable dans la liste officielle.', 404);
-  return etudiant;
+  if (!etudiant) throw new ErreurMetier('Étudiant introuvable dans la liste.', 404);
+  return { ...etudiant, nom_complet: nomComplet(etudiant) };
 }
 
 // Tire un code au hasard et l'enregistre. Si par un hasard extraordinaire

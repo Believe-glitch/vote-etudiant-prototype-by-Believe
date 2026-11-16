@@ -224,7 +224,7 @@ test('présidence « par site » : chaque site dévoilé à part, puis le total'
 });
 
 test('le journal note les actions, ne contient aucun code, et ne s’efface pas', async () => {
-  const journal = await observateur.get('/api/admin/journal');
+  const journal = { json: (await observateur.get('/api/admin/journal')).json.lignes };
   const actions = new Set(journal.json.map((l) => l.action));
   for (const attendu of ['code_remis', 'code_remplace', 'vote_ouvert', 'resultats_devoiles', 'second_tour_cree', 'elu_d_office']) {
     assert.ok(actions.has(attendu), attendu);
@@ -234,4 +234,28 @@ test('le journal note les actions, ne contient aucun code, et ne s’efface pas'
   await assert.rejects(sql`delete from journal`, /ni modifié ni effacé/);
   await assert.rejects(sql`update journal set action = 'falsifie'`, /ni modifié ni effacé/);
   await assert.rejects(sql`truncate journal`, /ni modifié ni effacé/);
+});
+
+test('le journal se filtre : mot cherché, action, officiel, site et période', async () => {
+  const tout = (await observateur.get('/api/admin/journal')).json;
+  assert.ok(tout.total >= tout.lignes.length);
+
+  const ouvertures = (await observateur.get('/api/admin/journal?action=vote_ouvert')).json;
+  assert.ok(ouvertures.lignes.length > 0);
+  assert.ok(ouvertures.lignes.every((l) => l.action === 'vote_ouvert'));
+
+  const motif = (await observateur.get('/api/admin/journal?recherche=perdu')).json;
+  assert.ok(motif.lignes.some((l) => l.action === 'code_remplace'));
+
+  const auto = (await observateur.get('/api/admin/journal?officiel=auto')).json;
+  assert.ok(auto.lignes.every((l) => l.officiel === 'Le serveur (automatique)'));
+
+  // Les ouvertures de séance à N'djili seulement
+  const ndjiOuvertures = (await observateur.get(`/api/admin/journal?action=vote_ouvert&campus=${ndji}`)).json;
+  assert.ok(ndjiOuvertures.lignes.length > 0);
+  assert.ok(ndjiOuvertures.lignes.every((l) => l.details.campusId === ndji));
+
+  const futur = new Date(Date.now() + 3600e3).toISOString();
+  assert.equal((await observateur.get(`/api/admin/journal?du=${encodeURIComponent(futur)}`)).json.lignes.length, 0);
+  assert.equal((await observateur.get('/api/admin/journal?officiel=n%27importe')).statut, 400);
 });

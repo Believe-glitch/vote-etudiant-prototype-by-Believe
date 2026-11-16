@@ -3,20 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>À propos – Vote étudiant prototype</title>
+  <meta name="theme-color" content="#06274a">
+  <title>À propos – URKIMeVote</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/images/icone-180.png">
   <link rel="stylesheet" href="/css/style.css">
   <script type="module" src="/js/page-simple.js"></script>
 </head>
 <body>
   <header class="entete">
     <div class="entete-contenu">
-      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <a class="logo" href="/" aria-label="URKIMeVote, retour à l’accueil">
+        <span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span>
+      </a>
       <nav class="navigation" aria-label="Menu principal">
         <a href="/">Accueil</a>
         <a href="/candidats">Candidats</a>
         <a href="/resultats">Résultats</a>
         <a href="/regles">Règles</a>
+        <a href="/admin/">Espace officiels</a>
         <a href="/apropos">À propos</a>
       </nav>
     </div>
@@ -26,25 +31,63 @@
     <h1>À propos du projet</h1>
 
     <section class="carte section">
+      <p class="logo-mot sur-clair logo-grand" role="img" aria-label="URKIMeVote">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</p>
       <h2>Le projet</h2>
-      <p>Ce site permet d’organiser les élections étudiantes de l’Université Révérend Kim, sur les sites de Lingwala et de N’djili : CP, CPA et secrétaire de chaque promotion, et présidence de l’université.</p>
+      <p>URKIMeVote permet d’organiser les élections étudiantes de l’Université Révérend Kim, sur les sites de Lingwala et de N’djili : CP, CPA et secrétaire de chaque promotion, et présidence de l’université.</p>
       <p>Il garantit trois choses : <strong>simple</strong> (on vote en une minute depuis son téléphone), <strong>juste</strong> (un étudiant, un code, une voix par poste) et <strong>transparent</strong> (participation en direct, résultats dévoilés à tous, choix secret).</p>
     </section>
 
     <section class="carte section">
-      <h2>Prototype de démonstration</h2>
-      <p>Cette version est un prototype : les étudiants et les candidats sont fictifs. Elle sert à montrer le fonctionnement du site avant sa validation par l’université.</p>
+      <h2>Pourquoi ce projet</h2>
+      <p>À l’Université Révérend Kim, les élections étudiantes se déroulent encore surtout sur papier. Avec le nombre d’étudiants que compte l’université, sur deux sites, ce système devient lent et lourd : files d’attente, dépouillement à la main, résultats longs à connaître, et des doutes qui s’installent facilement.</p>
+      <p>J’ai voulu <strong>fluidifier les votes</strong> : que chaque étudiant puisse voter en une minute depuis son téléphone, et que les résultats tombent pour tout le monde au même moment, sans contestation possible.</p>
+      <p>J’ai aussi voulu <strong>créer un engouement positif autour des élections</strong> : suivre la participation en direct, découvrir les candidats et leurs slogans, vivre le dévoilement des résultats ensemble. Le but est de donner envie à tous les étudiants de voter.</p>
+      <div class="auteur">
+        <span class="auteur-initiales" aria-hidden="true">BMK</span>
+        <p><strong>Believe Mukengeshayi Kadima</strong><br><span class="texte-doux">Étudiant en Sciences informatiques, créateur de URKIMeVote</span></p>
+      </div>
     </section>
 
     <section class="carte section">
-      <h2>Comment le site est construit</h2>
-      <p>Toutes les règles du vote sont vérifiées par le serveur, et une partie d’entre elles directement par la base de données. Même quelqu’un qui modifie la page dans son navigateur ne peut pas les contourner.</p>
-      <p class="texte-doux">Serveur Node.js (Fastify), base de données PostgreSQL, pages légères sans framework pour fonctionner sur tous les téléphones.</p>
+      <h2>Prototype de démonstration</h2>
+      <p>Cette version est un prototype : les étudiants et les candidats sont fictifs, et leurs portraits sont de simples dessins. Dans la version finale, le superviseur chargera les vraies photos des candidats. Ce prototype sert à montrer le fonctionnement de l’application avant sa validation par l’université.</p>
     </section>
 
-    <p class="section"><a class="bouton bouton-contour" href="/admin/">Espace officiels</a></p>
+    <section class="carte section">
+      <h2>Comment l’application est construite</h2>
+      <p>URKIMeVote est une <strong>application web</strong> : on l’ouvre dans un navigateur comme un site, mais un serveur travaille derrière. Il vérifie les codes, enregistre les votes et calcule les résultats. Toutes les règles du vote sont vérifiées par ce serveur, et une partie d’entre elles directement par la base de données : même quelqu’un qui modifie la page dans son navigateur ne peut pas les contourner.</p>
+      <p class="texte-doux">Serveur Node.js (Fastify), base de données PostgreSQL, pages légères sans framework pour fonctionner sur tous les téléphones.</p>
+    </section>
   </main>
 
-  <footer class="pied">Prototype de démonstration · Université Révérend Kim</footer>
+  <footer class="pied">
+    <div class="pied-contenu">
+      <div class="pied-marque">
+        <a class="logo" href="/" aria-label="URKIMeVote, retour à l’accueil"><span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span></a>
+        <p>Le vote électronique des élections étudiantes de l’Université Révérend Kim : simple, juste et transparent.</p>
+      </div>
+      <nav class="pied-colonne" aria-label="Pages du site">
+        <p class="pied-titre">Le site</p>
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles du vote</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+      <div class="pied-colonne">
+        <p class="pied-titre">Officiels</p>
+        <a href="/admin/">Espace officiels</a>
+        <p class="pied-titre pied-titre-suite">Université</p>
+        <div class="pied-universite">
+          <span class="pied-ecusson-fond"><img class="pied-ecusson" src="/images/ecusson-urkim-144.webp" alt="Écusson de l’Université Révérend Kim" width="129" height="144"></span>
+          <span>Université Révérend Kim<br>Lingwala · N’djili</span>
+        </div>
+      </div>
+    </div>
+    <div class="pied-bas">
+      <p>Élections étudiantes · Lingwala et N’djili</p>
+      <p>© 2026 URKIMeVote · Conçu et développé par Believe Mukengeshayi Kadima · Prototype de démonstration</p>
+    </div>
+  </footer>
 </body>
 </html>

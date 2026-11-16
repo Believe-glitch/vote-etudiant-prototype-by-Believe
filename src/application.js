@@ -112,7 +112,7 @@ export async function construireApplication({ config, sql, journalisation = true
 
   app.setErrorHandler((erreur, requete, reponse) => {
     if (erreur instanceof ErreurMetier) {
-      return reponse.code(erreur.statutHttp).send({ erreur: erreur.message });
+      return reponse.code(erreur.statutHttp).send({ erreur: erreur.message, ...erreur.donnees });
     }
     if (erreur.validation) {
       return reponse.code(400).send({ erreur: 'Les informations envoyées sont incomplètes ou incorrectes.' });

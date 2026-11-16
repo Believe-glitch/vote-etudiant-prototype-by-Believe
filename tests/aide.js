@@ -30,6 +30,7 @@ export async function demarrerTest() {
     enProduction: false,
     donneesDemo: true,
     motDePasseDemo: MOT_DE_PASSE,
+    codesDemo: false,   // les tests remettent eux-mêmes les codes
   };
   await preparerBase(sql, config);
   const app = await construireApplication({ config, sql, journalisation: false });
