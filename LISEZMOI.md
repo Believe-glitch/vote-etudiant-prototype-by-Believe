@@ -319,15 +319,22 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
 - **Le logo** est écrit directement dans l’en-tête de chaque page (`<span class="logo-mot">`) :
   les lettres sont du texte, et le V est un petit dessin (une coche qui sort d’un téléphone).
   Son apparence se règle dans `public/css/style.css`, section « Le logo URKIMeVote ».
-  Sur un fond clair, ajoute la classe `sur-clair` : l’or devient bleu roi.
+  Le « e », le téléphone et le V restent toujours en or. Sur un fond clair, ajoute la classe
+  `sur-clair` : les lettres deviennent foncées.
 - **L’icône de l’onglet** est `public/favicon.svg` ; celle des téléphones, `public/images/icone-180.png`.
 - **Le logo en image**, pour tes diapositives et tes documents : `public/images/logo-urkimevote-fond-fonce.png`
   (lettres blanches, à poser sur un fond bleu) et `logo-urkimevote-fond-clair.png` (lettres bleues, pour
   un fond blanc). Leur fond est transparent.
-- **Les couleurs** sont des variables, tout en haut de `public/css/style.css` :
-  `--encre` (bleu marine), `--royal` (bleu roi), `--accent` (or). Change une valeur, tout le site suit.
-- **L’écusson de l’université** est dans `public/images/` (deux tailles). Il est affiché sur la page
-  d’accueil, en bas des pages et sur la connexion des officiels. Pour le vrai scrutin, demande à
+- **Les couleurs** sont des variables, tout en haut de `public/css/style.css` : le bleu et le blanc
+  dominent, le noir sert aux boutons principaux, et l’or (`--or`) est réservé au logo, à l’Espace
+  officiels et aux **votes ouverts** (leur carte est encadrée d’or). Change une valeur, tout le site suit.
+- **Le mode clair et le mode sombre** : le bloc `[data-theme="sombre"]` du même fichier donne les
+  couleurs du mode sombre. Le petit fichier `public/js/theme.js` choisit le mode : celui du téléphone
+  par défaut, ou celui choisi avec le bouton ◐ (retenu par le navigateur).
+- **Le menu** : sur ordinateur, les liens sont dans la barre du haut ; sur téléphone et tablette,
+  ils sont dans le menu « trois barres » (géré aussi par `public/js/theme.js`).
+- **L’écusson de l’université** est dans `public/images/` (deux tailles). Il est affiché dans le bandeau
+  de l’accueil (dans la barre du haut sur téléphone), en bas des pages et sur la connexion des officiels. Pour le vrai scrutin, demande à
   l’université l’autorisation d’utiliser son écusson.
 - **La police des titres** (Poppins) est dans `public/polices/`, avec sa licence libre.
 
