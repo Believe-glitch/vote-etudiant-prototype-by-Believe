@@ -3,20 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Résultats – Vote étudiant prototype</title>
+  <meta name="theme-color" content="#06274a">
+  <title>Résultats – URKIMeVote</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/images/icone-180.png">
   <link rel="stylesheet" href="/css/style.css">
   <script type="module" src="/js/resultats.js"></script>
 </head>
 <body>
   <header class="entete">
     <div class="entete-contenu">
-      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype</a>
+      <a class="logo" href="/" aria-label="URKIMeVote, retour à l’accueil">
+        <span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span>
+      </a>
       <nav class="navigation" aria-label="Menu principal">
         <a href="/">Accueil</a>
         <a href="/candidats">Candidats</a>
         <a href="/resultats">Résultats</a>
         <a href="/regles">Règles</a>
+        <a href="/admin/">Espace officiels</a>
         <a href="/apropos">À propos</a>
       </nav>
     </div>
@@ -27,8 +32,33 @@
     <div id="vue-liste" class="cache">
       <h1>Résultats</h1>
       <p class="texte-doux">Les résultats apparaissent ici dès que le superviseur les dévoile. La page se met à jour toute seule.</p>
+
+      <form id="filtres" class="carte carte-simple filtres" role="search" aria-label="Trouver un résultat">
+        <h2 class="petit-titre">Trouver le résultat de ma promotion</h2>
+        <div class="grille-filtres">
+          <div class="champ"><label for="filtre-site">Site</label><select id="filtre-site"></select></div>
+          <div class="champ"><label for="filtre-faculte">Faculté</label><select id="filtre-faculte"></select></div>
+          <div class="champ"><label for="filtre-promotion">Promotion</label><select id="filtre-promotion"></select></div>
+          <div class="champ"><label for="filtre-poste">Poste</label>
+            <select id="filtre-poste">
+              <option value="">Tous les postes</option>
+              <option value="CP">CP</option>
+              <option value="CPA">CPA</option>
+              <option value="SECRETAIRE">Secrétaire</option>
+              <option value="PRESIDENCE">Présidence</option>
+            </select>
+          </div>
+          <div class="champ champ-large"><label for="filtre-texte">Recherche</label>
+            <input id="filtre-texte" type="search" placeholder="ex. L1 Droit, Génie logiciel…" autocomplete="off"></div>
+        </div>
+        <div class="ligne-flex">
+          <p id="compte-filtre" class="texte-doux petit" aria-live="polite"></p>
+          <button id="effacer-filtres" class="bouton bouton-contour bouton-petit" type="button">Effacer les filtres</button>
+        </div>
+      </form>
+
       <section class="section">
-        <h2>En attente du dévoilement</h2>
+        <h2>Votes en cours et en attente du dévoilement</h2>
         <div id="en-attente" class="grille-3"></div>
       </section>
       <section class="section">
@@ -47,6 +77,34 @@
     </div>
   </main>
 
-  <footer class="pied">Les voix sont comptées sans aucun lien avec les codes : le choix de chacun reste secret.</footer>
+  <footer class="pied">
+    <div class="pied-contenu">
+      <div class="pied-marque">
+        <a class="logo" href="/" aria-label="URKIMeVote, retour à l’accueil"><span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span></a>
+        <p>Le vote électronique des élections étudiantes de l’Université Révérend Kim : simple, juste et transparent.</p>
+      </div>
+      <nav class="pied-colonne" aria-label="Pages du site">
+        <p class="pied-titre">Le site</p>
+        <a href="/">Accueil</a>
+        <a href="/candidats">Candidats</a>
+        <a href="/resultats">Résultats</a>
+        <a href="/regles">Règles du vote</a>
+        <a href="/apropos">À propos</a>
+      </nav>
+      <div class="pied-colonne">
+        <p class="pied-titre">Officiels</p>
+        <a href="/admin/">Espace officiels</a>
+        <p class="pied-titre pied-titre-suite">Université</p>
+        <div class="pied-universite">
+          <span class="pied-ecusson-fond"><img class="pied-ecusson" src="/images/ecusson-urkim-144.webp" alt="Écusson de l’Université Révérend Kim" width="129" height="144"></span>
+          <span>Université Révérend Kim<br>Lingwala · N’djili</span>
+        </div>
+      </div>
+    </div>
+    <div class="pied-bas">
+      <p>Les voix sont comptées sans aucun lien avec les codes : le choix de chacun reste secret.</p>
+      <p>© 2026 URKIMeVote · Conçu et développé par Believe Mukengeshayi Kadima · Prototype de démonstration</p>
+    </div>
+  </footer>
 </body>
 </html>

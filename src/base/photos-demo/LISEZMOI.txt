@@ -1,0 +1,5 @@
+Portraits dessinés de candidats FICTIFS, pour la démonstration.
+Ils sont ajoutés automatiquement quand DONNEES_DEMO=oui, seulement aux
+candidats de démonstration qui n'ont pas encore de photo.
+Pour le vrai scrutin, le superviseur charge les vraies photos depuis
+l'espace officiels (onglet Votes, bouton « Photo » sous chaque candidat).

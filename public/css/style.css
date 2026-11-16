@@ -1,26 +1,42 @@
 /* =====================================================================
-   Styles du site de vote étudiant
+   Styles du site URKIMeVote
    Pensés d'abord pour le téléphone : on agrandit ensuite pour l'ordinateur.
-   Polices du système (aucun téléchargement) : la page s'affiche vite,
-   même avec une connexion lente.
+
+   Couleurs : bleu marine et bleu roi (les bleus de l'université), avec
+   l'or comme couleur d'accent. Pour changer une couleur partout sur le
+   site, il suffit de modifier sa variable ci-dessous.
+
+   Polices : celles du téléphone ou de l'ordinateur pour le texte (rien à
+   télécharger), et Poppins pour les titres et le logo (un seul petit
+   fichier de 8 Ko, rangé dans public/polices).
    ===================================================================== */
 
+@font-face {
+  font-family: "Poppins";
+  src: url("/polices/poppins-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;   /* le texte s'affiche tout de suite, la police arrive ensuite */
+}
+
 :root {
-  --encre: #14213d;          /* bleu nuit : titres, texte principal */
-  --encre-douce: #4a5568;    /* texte secondaire */
-  --papier: #f7f5ef;         /* fond de page */
-  --papier-2: #ece8dc;       /* fond alterné */
-  --carte: #fdfbf6;          /* fond des cartes */
-  --accent: #e09f3e;         /* ambre : boutons, barres */
-  --accent-fonce: #8a4f05;   /* ambre foncé : texte sur fond clair */
+  --encre: #06274a;          /* bleu marine : en-tête, titres, texte principal */
+  --royal: #0b4fa3;          /* bleu roi : liens, éléments mis en avant */
+  --encre-douce: #46556b;    /* texte secondaire */
+  --papier: #f3f6fb;         /* fond de page */
+  --papier-2: #e3eaf5;       /* fond alterné */
+  --carte: #ffffff;          /* fond des cartes */
+  --accent: #f2b705;         /* or : boutons principaux, logo, barres */
+  --accent-fonce: #0b4fa3;   /* couleur d'accent lisible sur fond clair */
   --ok: #1f7a4d;             /* vert : réussite */
   --ok-fond: #e3f2e9;
   --alerte: #b42318;         /* rouge : erreur */
   --alerte-fond: #fdecea;
-  --trait: #d9d3c3;
-  --rayon: 14px;
-  --ombre: 0 1px 2px rgba(20, 33, 61, 0.06), 0 4px 16px rgba(20, 33, 61, 0.06);
+  --trait: #d3dceb;
+  --rayon: 16px;
+  --ombre: 0 1px 2px rgba(6, 39, 74, 0.06), 0 6px 20px rgba(6, 39, 74, 0.07);
   --police: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --police-titre: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --police-code: ui-monospace, "Cascadia Mono", "Consolas", "Liberation Mono", monospace;
 }
 
@@ -32,17 +48,17 @@ body {
   margin: 0;
   font-family: var(--police);
   font-size: 17px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--encre);
   background: var(--papier);
 }
 
 a { color: var(--accent-fonce); }
 img { max-width: 100%; display: block; }
-h1, h2, h3 { line-height: 1.2; margin: 0 0 0.5em; }
+h1, h2, h3 { font-family: var(--police-titre); font-weight: 600; line-height: 1.2; margin: 0 0 0.5em; }
 h1 { font-size: 1.9rem; }
-h2 { font-size: 1.4rem; }
-h3 { font-size: 1.1rem; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.08rem; }
 p { margin: 0 0 0.8em; }
 
 .cache { display: none !important; }
@@ -54,37 +70,68 @@ p { margin: 0 0 0.8em; }
 .entete {
   background: var(--encre);
   color: var(--papier);
+  border-bottom: 3px solid var(--accent);
 }
 .entete-contenu {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 0.8rem 1rem;
+  padding: 0.75rem 1rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem 1.2rem;
+  gap: 0.5rem 1.2rem;
 }
 .logo {
   color: var(--papier);
-  font-weight: 700;
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   margin-right: auto;
 }
-.logo-pastille {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: var(--accent); color: var(--encre);
-  display: grid; place-items: center; font-weight: 800;
-}
-.navigation { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; }
+.navigation { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; }
 .navigation a {
-  color: #c9d3e3; text-decoration: none; padding: 0.2rem 0;
+  color: #c9d6ea; text-decoration: none; padding: 0.2rem 0;
   border-bottom: 2px solid transparent;
 }
 .navigation a:hover, .navigation a[aria-current="page"] {
-  color: var(--papier); border-bottom-color: var(--accent);
+  color: #fff; border-bottom-color: var(--accent);
+}
+
+/* --- Le logo URKIMeVote ---------------------------------------------------
+   Le nom est écrit en lettres ; le V est un petit dessin (SVG) : une coche
+   qui sort d'un téléphone. Le « e » et le V ont la couleur d'accent.
+   Sur fond clair, ajouter la classe « sur-clair » : l'or devient bleu roi,
+   parce que l'or se lit mal sur du blanc. */
+
+.logo-mot {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--police-titre);
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--papier);
+  --logo-accent: var(--accent);
+  --logo-fond: var(--encre);       /* couleur du fond, pour détacher le V du téléphone */
+}
+.logo-accent { color: var(--logo-accent); }
+.logo-tel { height: 1.8em; width: auto; flex: none; margin: -0.3em 0.02em 0 0.06em; }
+.tel-trait { fill: none; stroke: var(--logo-accent); stroke-width: 6; }
+.tel-fin { stroke-width: 3.5; stroke-linecap: round; }
+.tel-plein { fill: var(--logo-accent); }
+.tel-halo, .tel-v { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.tel-halo { stroke: var(--logo-fond); stroke-width: 18; }
+.tel-v { stroke: var(--logo-accent); stroke-width: 8.5; }
+
+.logo-mot.sur-clair { color: var(--encre); --logo-accent: var(--royal); --logo-fond: var(--carte); }
+.logo-mot.logo-grand { font-size: 2.4rem; margin: 0.4rem 0 1rem; }
+
+.logo-suffixe {
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent); border: 1.5px solid var(--accent); border-radius: 999px;
+  padding: 0.1rem 0.6rem;
 }
 
 /* --- Mise en page --------------------------------------------------- */
@@ -96,33 +143,69 @@ main {
 }
 .section { margin-top: 2rem; }
 
+/* Petit trait doré sous les titres de section. */
+main > section.section:not(.carte):not(.bandeau) > h2::after {
+  content: "";
+  display: block;
+  width: 44px; height: 4px; border-radius: 2px;
+  background: var(--accent);
+  margin-top: 0.45rem;
+}
+
 .grille-2 { display: grid; gap: 1rem; }
 .grille-3 { display: grid; gap: 1rem; }
 @media (min-width: 720px) {
   .grille-2 { grid-template-columns: 1fr 1fr; }
   .grille-3 { grid-template-columns: repeat(3, 1fr); }
-  h1 { font-size: 2.4rem; }
+  h1 { font-size: 2.5rem; }
 }
 
 .carte {
   background: var(--carte);
   border-radius: var(--rayon);
   box-shadow: var(--ombre);
-  padding: 1.2rem;
-  border-top: 5px solid var(--accent);
+  padding: 1.25rem;
+  border-top: 4px solid var(--accent);
 }
 .carte-simple { border-top: none; }
 
+/* Une carte entière cliquable (liste des résultats). */
+a.carte { display: block; color: inherit; text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+a.carte:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(6, 39, 74, 0.08), 0 12px 28px rgba(6, 39, 74, 0.12); }
+
 .bandeau {
-  background: var(--encre);
-  color: var(--papier);
+  background: linear-gradient(135deg, var(--encre) 0%, var(--royal) 100%);
+  color: #fff;
   border-radius: var(--rayon);
   padding: 1.5rem;
 }
-.bandeau p { color: #c9d3e3; }
+.bandeau h1, .bandeau h2, .bandeau h3 { color: #fff; }
+.bandeau p { color: #dbe6f5; }
+.bandeau .pastille-devoile { color: var(--encre); }
+
+/* Le grand bandeau de la page d'accueil, avec l'écusson de l'université.
+   L'écusson est posé sur une carte blanche : ses lauriers sont noirs et
+   disparaîtraient sur le fond bleu. */
+.hero { display: grid; gap: 1.25rem; padding: 1.5rem; align-items: center; }
+.hero-ecusson {
+  justify-self: start;
+  background: #fff; border-radius: 18px; padding: 0.7rem 0.9rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+.hero-ecusson img { height: 96px; width: auto; }
+.hero-texte p:last-child { margin-bottom: 0; max-width: 46ch; }
+@media (min-width: 720px) {
+  .hero { grid-template-columns: 1fr auto; padding: 2.5rem; gap: 2.5rem; }
+  .hero-ecusson { order: 2; justify-self: end; padding: 1.1rem 1.4rem; }
+  .hero-ecusson img { height: 190px; }
+}
 
 .etape-numero {
-  font-size: 2rem; font-weight: 800; color: var(--accent-fonce); line-height: 1;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--police-titre); font-size: 1.25rem; font-weight: 600; line-height: 1;
+  background: var(--accent); color: var(--encre);
+  margin-bottom: 0.8rem;
 }
 
 /* --- Formulaires et boutons ------------------------------------------ */
@@ -138,8 +221,12 @@ input[type="text"], input[type="password"], input[type="number"], input[type="se
   color: var(--encre);
 }
 input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--royal);
   outline-offset: 2px;
+}
+/* Sur les fonds bleus, le contour de sélection est doré pour rester visible. */
+.entete a:focus-visible, .entete button:focus-visible, .bandeau a:focus-visible, .bandeau button:focus-visible {
+  outline-color: var(--accent);
 }
 .champ { margin-bottom: 0.9rem; }
 .champ-code {
@@ -156,32 +243,35 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
   border-radius: 10px;
   border: 2px solid var(--encre);
   background: var(--encre);
-  color: var(--papier);
+  color: #fff;
   cursor: pointer;
   text-decoration: none;
   min-height: 46px;
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
-.bouton:hover { filter: brightness(1.15); }
+.bouton:hover { filter: brightness(1.12); }
+.bouton:active { transform: translateY(1px); }
 .bouton:disabled { opacity: 0.5; cursor: not-allowed; }
-.bouton-accent { background: var(--accent); border-color: var(--accent); color: var(--encre); }
+.bouton-accent { background: var(--accent); border-color: var(--accent); color: var(--encre); box-shadow: 0 2px 0 #c99700; }
 .bouton-contour { background: transparent; color: var(--encre); }
 .bouton-danger { background: var(--alerte); border-color: var(--alerte); color: #fff; }
-.bouton-petit { padding: 0.35rem 0.7rem; min-height: 36px; font-size: 0.9rem; }
+.bouton-petit { padding: 0.35rem 0.7rem; min-height: 36px; font-size: 0.9rem; box-shadow: none; }
 .bouton-large { width: 100%; }
 .rangee-boutons { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.bouton + p { margin-top: 0.9rem; }   /* petit texte d'aide placé sous un bouton */
 
 /* --- Messages --------------------------------------------------------- */
 
 .message {
   padding: 0.8rem 1rem; border-radius: 10px; margin: 0.8rem 0;
-  border-left: 5px solid var(--encre-douce); background: var(--papier-2);
+  border-left: 5px solid var(--royal); background: var(--papier-2);
 }
 .message-erreur { border-left-color: var(--alerte); background: var(--alerte-fond); color: #7a1a12; }
 .message-ok { border-left-color: var(--ok); background: var(--ok-fond); color: #11502f; }
 
 .pastille {
   display: inline-block; font-size: 0.8rem; font-weight: 700;
-  padding: 0.15rem 0.6rem; border-radius: 999px;
+  padding: 0.15rem 0.65rem; border-radius: 999px;
   background: var(--papier-2); color: var(--encre-douce);
 }
 .pastille-ouvert { background: var(--ok-fond); color: var(--ok); }
@@ -207,7 +297,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 }
 .photo-initiales {
   display: grid; place-items: center;
-  font-weight: 800; font-size: 1.3rem; color: var(--encre);
+  font-family: var(--police-titre); font-weight: 600; font-size: 1.2rem; color: var(--royal);
   background: var(--papier-2);
 }
 .photo-grande { width: 96px; height: 96px; }
@@ -215,10 +305,11 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 /* Choix du candidat au moment du vote : toute la carte est cliquable. */
 .fieldset-nu { border: none; padding: 0; margin: 0; min-width: 0; }
 .choix input { position: absolute; opacity: 0; pointer-events: none; }
-.choix { position: relative; cursor: pointer; }
+.choix { position: relative; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
+.choix:hover { border-color: #9fb6d8; }
 .choix .candidat-nom, .choix .candidat-slogan { display: block; }
-.choix:has(input:checked) { border-color: var(--accent); background: #fff7ea; box-shadow: 0 0 0 3px rgba(224, 159, 62, 0.35); }
-.choix:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+.choix:has(input:checked) { border-color: var(--royal); background: #eef4fd; box-shadow: 0 0 0 3px rgba(11, 79, 163, 0.22); }
+.choix:has(input:focus-visible) { outline: 3px solid var(--royal); outline-offset: 2px; }
 
 /* --- Votes en cours et décompte ----------------------------------------- */
 
@@ -230,14 +321,19 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .jauge {
   height: 10px; border-radius: 999px; background: var(--papier-2); overflow: hidden;
 }
+.bandeau .jauge { background: rgba(255, 255, 255, 0.25); }
 .jauge-remplissage {
-  height: 100%; width: 0; background: var(--accent);
+  height: 100%; width: 0; background: var(--accent); border-radius: 999px;
   transition: width 0.6s ease;
 }
 
 /* --- Résultats --------------------------------------------------------- */
 
-.resultat-chiffre { font-size: 3rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.resultat-chiffre {
+  font-family: var(--police-titre); font-size: 3rem; font-weight: 600; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.bandeau .resultat-chiffre { color: #fff; }
 .barres { display: grid; gap: 0.9rem; margin-top: 1rem; }
 .barre-ligne {
   display: grid; grid-template-columns: 56px 1fr; gap: 0.8rem; align-items: center;
@@ -248,7 +344,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .barre-entete { display: flex; justify-content: space-between; gap: 0.5rem; font-weight: 700; }
 .barre-voix { font-variant-numeric: tabular-nums; }
 .barre-fond { height: 22px; border-radius: 8px; background: var(--papier-2); overflow: hidden; margin-top: 0.3rem; }
-.barre-remplissage { height: 100%; width: 0; background: var(--encre-douce); border-radius: 8px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.barre-remplissage { height: 100%; width: 0; background: #7f9cc6; border-radius: 8px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
 .barre-ligne.gagnant .barre-remplissage { background: var(--accent); }
 .barre-ligne.gagnant .barre-fond { box-shadow: 0 0 0 2px var(--accent); }
 .badge-place {
@@ -260,7 +356,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .photo.petite { width: 56px; height: 56px; font-size: 1rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  .barre-ligne, .barre-remplissage, .badge-place, .jauge-remplissage { transition: none; }
+  .barre-ligne, .barre-remplissage, .badge-place, .jauge-remplissage, a.carte, .bouton, .choix { transition: none; }
 }
 
 /* --- Tableaux ----------------------------------------------------------- */
@@ -268,7 +364,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .tableau-conteneur { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; }
 th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--papier-2); vertical-align: middle; }
-th { background: var(--encre); color: var(--papier); font-weight: 600; font-size: 0.9rem; }
+th { background: var(--encre); color: #fff; font-weight: 600; font-size: 0.9rem; }
 td.nombre, th.nombre { text-align: right; font-variant-numeric: tabular-nums; }
 tr.total td { font-weight: 700; background: var(--papier-2); }
 
@@ -277,10 +373,10 @@ tr.total td { font-weight: 700; background: var(--papier-2); }
 dialog {
   border: none; border-radius: var(--rayon); padding: 1.4rem;
   max-width: min(520px, 92vw); width: 100%;
-  box-shadow: 0 20px 60px rgba(20, 33, 61, 0.35);
+  box-shadow: 0 20px 60px rgba(6, 39, 74, 0.35);
   color: var(--encre); background: var(--carte);
 }
-dialog::backdrop { background: rgba(20, 33, 61, 0.55); }
+dialog::backdrop { background: rgba(6, 39, 74, 0.6); }
 .code-affiche {
   font-family: var(--police-code); font-size: 2rem; font-weight: 800;
   letter-spacing: 0.08em; text-align: center;
@@ -296,7 +392,7 @@ dialog::backdrop { background: rgba(20, 33, 61, 0.55); }
   padding: 0.5rem 1rem; border-radius: 999px;
   border: 2px solid var(--encre); background: transparent; color: var(--encre);
 }
-.onglet[aria-selected="true"] { background: var(--encre); color: var(--papier); }
+.onglet[aria-selected="true"] { background: var(--encre); color: #fff; }
 
 .scrutin-admin { margin-bottom: 1.2rem; }
 .seance-admin {
@@ -306,6 +402,93 @@ dialog::backdrop { background: rgba(20, 33, 61, 0.55); }
 .ligne-flex { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: space-between; }
 .champ-duree { width: 90px !important; }
 
+/* Page de connexion des officiels. */
+.connexion-officiels { max-width: 460px; margin: 1rem auto 0; }
+.connexion-ecusson { height: 104px; width: auto; margin: 0 auto 1rem; }
+.connexion-officiels h1 { font-size: 1.7rem; text-align: center; }
+.connexion-officiels h1 + p { text-align: center; }
+
+/* --- Pied de page ----------------------------------------------------------- */
+
 .pied {
-  max-width: 1080px; margin: 0 auto; padding: 1.5rem 1rem; color: var(--encre-douce); font-size: 0.85rem;
+  margin-top: 2rem;
+  background: var(--encre);
+  color: #c9d6ea;
+  font-size: 0.92rem;
+  border-top: 3px solid var(--accent);
 }
+.pied a { color: #fff; text-decoration: none; }
+.pied a:hover { color: var(--accent); }
+.pied a:focus-visible { outline-color: var(--accent); }
+.pied p { margin: 0; }
+.pied-contenu {
+  max-width: 1080px; margin: 0 auto; padding: 2rem 1rem 1.5rem;
+  display: grid; gap: 1.75rem;
+}
+@media (min-width: 720px) {
+  .pied-contenu { grid-template-columns: 1.6fr 1fr 1.2fr; }
+}
+.pied-marque p { margin-top: 0.8rem; max-width: 34ch; }
+.pied-colonne { display: flex; flex-direction: column; gap: 0.45rem; align-items: flex-start; }
+.pied-titre { font-family: var(--police-titre); font-weight: 600; color: #fff; margin-bottom: 0.2rem !important; }
+.pied-titre-suite { margin-top: 0.9rem !important; }
+.pied-universite { display: flex; align-items: center; gap: 0.7rem; }
+/* L'écusson est posé sur un rond blanc : ses lauriers noirs restent visibles. */
+.pied-ecusson-fond { background: #fff; border-radius: 12px; padding: 4px 6px; display: inline-flex; flex: none; }
+.pied-ecusson { height: 46px; width: auto; }
+.pied-bas {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  max-width: 1080px; margin: 0 auto; padding: 1rem;
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; justify-content: space-between;
+  font-size: 0.82rem; color: #9fb2cf;
+}
+
+/* Le créateur, sur la page À propos */
+.auteur { display: flex; align-items: center; gap: 0.9rem; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--papier-2); }
+.auteur p { margin: 0; }
+.auteur-initiales {
+  width: 54px; height: 54px; border-radius: 50%; flex: none;
+  display: grid; place-items: center;
+  font-family: var(--police-titre); font-weight: 600; letter-spacing: 0.04em;
+  background: var(--encre); color: var(--accent);
+}
+
+/* --- Listes des inscrits et impression ------------------------------------- */
+
+.seulement-impression { display: none; }
+.ligne-nouvelle td { background: #fff7d6; }
+.tableau-liste td { vertical-align: top; }
+
+/* Quand on imprime (Ctrl + P), on ne garde que la liste : pas de menu,
+   pas de boutons, et une colonne pour la signature des étudiants. */
+@media print {
+  @page { margin: 14mm; }
+  body { background: #fff; font-size: 11pt; }
+  .entete, .onglets, .pied, .sans-impression, #message-general, dialog { display: none !important; }
+  .seulement-impression { display: block; }
+  th.seulement-impression, td.seulement-impression { display: table-cell; }
+  main { padding: 0; max-width: none; }
+  .carte { box-shadow: none; border: none; padding: 0; }
+  .titre-impression h1 { font-size: 18pt; margin: 0.3rem 0 0.8rem; }
+  .titre-impression .logo-mot { font-size: 14pt; }
+  table { border-radius: 0; }
+  th { background: #fff !important; color: #000; border-bottom: 2px solid #000; }
+  td { border-bottom: 1px solid #999; }
+  tr { break-inside: avoid; }
+  .colonne-signature { width: 28%; }
+  .ligne-nouvelle td { background: none; }
+  a { color: #000; text-decoration: none; }
+}
+
+/* --- Barres de filtres (résultats, journal, statistiques) -------------------- */
+
+.filtres { margin-top: 1.25rem; }
+.petit-titre { font-size: 1.05rem; }
+.grille-filtres { display: grid; gap: 0 0.9rem; grid-template-columns: 1fr; }
+@media (min-width: 600px) { .grille-filtres { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 900px) {
+  .grille-filtres { grid-template-columns: repeat(4, 1fr); }
+  .grille-filtres .champ-large { grid-column: span 2; }
+}
+.filtres .champ { margin-bottom: 0.7rem; }
+.filtres select, .filtres input { padding: 0.55rem 0.7rem; }

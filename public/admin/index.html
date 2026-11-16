@@ -3,21 +3,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06274a">
   <meta name="robots" content="noindex">
-  <title>Espace officiels – Vote étudiant prototype</title>
+  <title>Espace officiels – URKIMeVote</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/images/icone-180.png">
   <link rel="stylesheet" href="/css/style.css">
   <script type="module" src="/js/admin/connexion.js"></script>
 </head>
 <body>
   <header class="entete">
     <div class="entete-contenu">
-      <a class="logo" href="/"><span class="logo-pastille">✓</span> Vote étudiant prototype · Officiels</a>
+      <a class="logo" href="/" aria-label="URKIMeVote, retour à l’accueil">
+        <span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span>
+        <span class="logo-suffixe">Officiels</span>
+      </a>
     </div>
   </header>
 
   <main>
-    <section class="carte" aria-labelledby="titre-connexion">
+    <section class="carte connexion-officiels" aria-labelledby="titre-connexion">
+      <img class="connexion-ecusson" src="/images/ecusson-urkim-360.webp" alt="Écusson de l’Université Révérend Kim" width="323" height="360">
       <h1 id="titre-connexion">Espace officiels</h1>
       <p class="texte-doux">Réservé au superviseur, aux distributeurs de codes et aux observateurs.</p>
       <form id="formulaire-connexion" novalidate>

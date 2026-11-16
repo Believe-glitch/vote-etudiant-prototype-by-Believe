@@ -9,6 +9,7 @@ import {
   api, e, photoCandidat, afficherMessage, ecouterDirect, blocSeance, appliquerLargeurs,
   pourcentage, lancerDecomptes, marquerPageCourante,
 } from './commun.js';
+import { brancherFiltrePromotion, pourComparer } from './filtres.js';
 
 marquerPageCourante();
 lancerDecomptes();
@@ -26,37 +27,80 @@ else demarrerListe();
 // Vue liste
 // ---------------------------------------------------------------------
 
-function demarrerListe() {
+async function demarrerListe() {
   document.querySelector('#vue-liste').classList.remove('cache');
   const zoneAttente = document.querySelector('#en-attente');
   const zoneDevoiles = document.querySelector('#devoiles');
+  const champPoste = document.querySelector('#filtre-poste');
+  const champTexte = document.querySelector('#filtre-texte');
+  const zoneCompte = document.querySelector('#compte-filtre');
 
-  async function chargerListe() {
-    const liste = await api('/api/resultats').catch(() => []);
-    zoneDevoiles.innerHTML = liste.length === 0
-      ? '<p class="texte-doux">Aucun résultat dévoilé pour le moment.</p>'
-      : liste.map((r) => `
-          <a class="carte" href="/resultats?scrutin=${r.id}">
-            <h3>${e(r.nomPoste)}${r.tour > 1 ? ` · ${r.tour}e tour` : ''}</h3>
-            <p class="texte-doux petit">${e(r.promotion ?? 'Toute l’université')}</p>
-            <span class="pastille pastille-devoile">${r.eluDOffice ? 'Élu(e) d’office' : r.complet ? 'Résultats complets' : 'Résultats partiels'}</span>
-          </a>`).join('');
+  let devoiles = [];      // résultats dévoilés (liste complète, avant filtre)
+  let seances = [];       // votes en cours ou en attente (direct)
+
+  // Le filtre : site → faculté → promotion, poste, et texte libre.
+  // La présidence concerne tout le monde : elle reste visible quel que soit
+  // le site, la faculté ou la promotion choisis (sauf si on filtre un poste).
+  const structure = await api('/api/structure').catch(() => ({ campus: [], facultes: [], promotions: [] }));
+  const filtre = brancherFiltrePromotion({
+    site: document.querySelector('#filtre-site'),
+    faculte: document.querySelector('#filtre-faculte'),
+    promotion: document.querySelector('#filtre-promotion'),
+  }, structure, afficher);
+  champPoste.addEventListener('change', afficher);
+  champTexte.addEventListener('input', afficher);
+  document.querySelector('#filtres').addEventListener('submit', (evenement) => evenement.preventDefault());
+  document.querySelector('#effacer-filtres').addEventListener('click', () => {
+    filtre.reinitialiser();
+    champPoste.value = '';
+    champTexte.value = '';
+    afficher();
+  });
+
+  function garde(element) {
+    if (champPoste.value && element.poste !== champPoste.value) return false;
+    if (element.promotionId !== null && !filtre.correspond(element.promotionId)) return false;
+    const texte = pourComparer(champTexte.value);
+    if (texte && !pourComparer(`${element.nomPoste} ${element.promotion ?? 'presidence universite'}`).includes(texte)) return false;
+    return true;
   }
 
-  ecouterDirect((etat) => {
-    if (etat.versionResultats !== versionConnue) {
-      versionConnue = etat.versionResultats;
-      chargerListe();
-    }
-    zoneAttente.innerHTML = etat.seances.length === 0
-      ? '<p class="texte-doux">Aucun vote en cours ni en attente.</p>'
-      : etat.seances.map((s) => `
+  function afficher() {
+    const attente = seances.filter(garde);
+    const resultats = devoiles.filter(garde);
+    zoneAttente.innerHTML = attente.length === 0
+      ? '<p class="texte-doux">Aucun vote en cours ni en attente pour ce choix.</p>'
+      : attente.map((s) => `
           <a class="carte" href="/resultats?scrutin=${s.scrutinId}">
             <h3>${e(s.nomPoste)}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}</h3>
             <p class="texte-doux petit">${e(s.promotion ?? 'Toute l’université')} · séance de ${e(s.campus)}</p>
             ${blocSeance(s)}
           </a>`).join('');
     appliquerLargeurs(zoneAttente);
+    zoneDevoiles.innerHTML = resultats.length === 0
+      ? `<p class="texte-doux">${devoiles.length === 0 ? 'Aucun résultat dévoilé pour le moment.' : 'Aucun résultat ne correspond à ces filtres.'}</p>`
+      : resultats.map((r) => `
+          <a class="carte" href="/resultats?scrutin=${r.id}">
+            <h3>${e(r.nomPoste)}${r.tour > 1 ? ` · ${r.tour}e tour` : ''}</h3>
+            <p class="texte-doux petit">${e(r.promotion ?? 'Toute l’université')}</p>
+            <span class="pastille pastille-devoile">${r.eluDOffice ? 'Élu(e) d’office' : r.complet ? 'Résultats complets' : 'Résultats partiels'}</span>
+          </a>`).join('');
+    zoneCompte.textContent = `${resultats.length} résultat${resultats.length > 1 ? 's' : ''} dévoilé${resultats.length > 1 ? 's' : ''} sur ${devoiles.length}`;
+  }
+
+  async function chargerListe() {
+    devoiles = await api('/api/resultats').catch(() => []);
+    afficher();
+  }
+
+  ecouterDirect((etat) => {
+    seances = etat.seances;
+    if (etat.versionResultats !== versionConnue) {
+      versionConnue = etat.versionResultats;
+      chargerListe();
+    } else {
+      afficher();
+    }
   });
 }
 
