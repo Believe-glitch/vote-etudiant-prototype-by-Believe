@@ -1,4 +1,4 @@
-// Onglets « Inscription et codes » (distributeur) et « Listes des inscrits »
+// Onglets « Inscription et codes » (distributeur) et « Liste des inscrits au vote »
 // (superviseur et observateur).
 //
 // Le distributeur et le superviseur peuvent corriger la liste (bouton
