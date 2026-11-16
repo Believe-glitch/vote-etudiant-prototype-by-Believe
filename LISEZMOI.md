@@ -101,14 +101,8 @@ Cas particuliers déjà prêts dans la démonstration :
 - **L1 Santé publique (N’djili), CPA** : aucun candidat → poste vacant ;
 - **Présidence** : une séance par site ; choisis avant le vote le mode de dévoilement.
 
-Pour **repartir de zéro** (effacer tous les votes et codes de la démo) : dans Neon, ouvre
-le **SQL Editor** et exécute :
-
-```sql
-drop schema public cascade; create schema public;
-```
-
-puis redémarre le serveur : tout est recréé.
+Pour **repartir propre avant la présentation** : **superviseur** → onglet *Nettoyage* →
+*Tout remettre comme au départ* (retape ton mot de passe et écris `EFFACER`). Voir la section 10.
 
 ---
 
@@ -204,13 +198,15 @@ vote-etudiant-prototype/
 │   │   ├── sessions.js        Connexions des étudiants et des officiels
 │   │   ├── limiteur.js        Blocage des essais ratés à répétition
 │   │   ├── journal.js         Journal des actions des officiels
+│   │   ├── nettoyage.js       Nettoyage du superviseur (votes, codes, sessions…)
 │   │   └── erreurs.js         Les erreurs expliquées à l’utilisateur
 │   └── routes/                Les adresses de l’API (/api/…)
 │       ├── public.js          Ouvertes à tous
 │       ├── etudiant.js        Espace étudiant
 │       ├── admin.js           Connexion des officiels, statistiques, journal
 │       ├── admin-codes.js     Distributeurs
-│       └── admin-scrutins.js  Superviseur
+│       ├── admin-scrutins.js  Superviseur
+│       └── admin-nettoyage.js Nettoyage (superviseur)
 ├── public/                    Les pages du site (HTML, CSS, JavaScript)
 │   ├── index.html             Accueil
 │   ├── candidats.html         Candidats
@@ -266,6 +262,10 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 
 ## 9. La remise des codes
 
+> **Méthode provisoire.** Cette façon de remettre les codes sert à la démonstration.
+> Elle sera améliorée après les essais : par exemple partir de la liste officielle de
+> chaque promotion (fournie par l’appariteur) et vérifier la carte d’étudiant avant la remise.
+
 - Le distributeur choisit le site, la faculté et la promotion, puis tape le **nom** de l’étudiant
   (postnom ou prénom obligatoire, matricule facultatif). L’étudiant est ajouté à la **liste de sa
   promotion** et reçoit son code, affiché une seule fois.
@@ -281,7 +281,29 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 
 ---
 
-## 10. L’identité visuelle (nom, logo, couleurs)
+## 10. Le nettoyage (superviseur)
+
+Onglet *Nettoyage*, réservé au superviseur, pour remettre le site en ordre après des essais :
+
+| Nettoyage | Ce qu’il fait |
+|---|---|
+| Effacer les votes d’un scrutin | Le scrutin revient « en préparation » ; ses candidats sont gardés. |
+| Effacer tous les votes | Tous les scrutins reviennent « en préparation » ; les seconds tours d’essai sont supprimés. |
+| Annuler les codes remis | D’une promotion ou de toutes. Les étudiants restent dans la liste mais doivent recevoir un nouveau code. Un étudiant qui avait déjà voté ne peut pas revoter avec le nouveau code. |
+| Déconnecter tout le monde | Ferme toutes les sessions, sauf celle du superviseur. |
+| Tout remettre comme au départ | Votes, codes, listes et candidats reviennent à la démonstration. **Seulement si `DONNEES_DEMO=oui`.** |
+
+Les protections :
+- il faut **retaper son mot de passe** et écrire le mot **`EFFACER`** ;
+- **impossible pendant qu’un vote est ouvert** ;
+- **le journal n’est jamais effacé** : chaque nettoyage y est noté (qui, quand, combien).
+
+En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **SQL Editor** →
+`drop schema public cascade; create schema public;`, puis redémarrer le serveur.
+
+---
+
+## 11. L’identité visuelle (nom, logo, couleurs)
 
 - **Le nom** s’écrit `URKIMeVote` : le « e » toujours en minuscule.
 - **Le logo** est écrit directement dans l’en-tête de chaque page (`<span class="logo-mot">`) :
@@ -301,7 +323,7 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 
 ---
 
-## 11. Sécurité : ce qui est déjà en place
+## 12. Sécurité : ce qui est déjà en place
 
 - Le code complet n’est **jamais** rangé dans la base : seulement son empreinte (HMAC-SHA-256).
 - Les règles du vote sont vérifiées par le **serveur**, et les plus importantes par la **base** elle-même.
@@ -323,7 +345,7 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 
 ---
 
-## 12. En cas de problème
+## 13. En cas de problème
 
 | Message | Solution |
 |---|---|

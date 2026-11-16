@@ -41,6 +41,16 @@ export async function fermerSession(sql, jeton) {
   await sql`delete from session where jeton_empreinte = ${empreinteJeton(jeton)}`;
 }
 
+// Ferme toutes les sessions (étudiants et officiels), sauf celle dont on
+// donne le jeton : celle du superviseur qui fait le nettoyage.
+// Renvoie le nombre de sessions fermées.
+export async function fermerAutresSessions(sql, jetonAGarder) {
+  const garder = typeof jetonAGarder === 'string' ? empreinteJeton(jetonAGarder) : '';
+  const fermees = await sql`delete from session where jeton_empreinte <> ${garder} and expire_le > now() returning 1`;
+  await sql`delete from session where jeton_empreinte <> ${garder}`;
+  return fermees.length;
+}
+
 export async function supprimerSessionsExpirees(sql) {
   await sql`delete from session where expire_le <= now()`;
 }

@@ -22,6 +22,11 @@ export async function afficherListes(conteneur, moi) {
   const structure = await api('/api/structure');
 
   conteneur.innerHTML = `
+    <p class="note-provisoire petit sans-impression" role="note">
+      <strong>Méthode provisoire.</strong> Cette façon de remettre les codes sert à la démonstration.
+      Elle sera améliorée après les essais (par exemple : partir de la liste officielle de chaque promotion
+      et vérifier la carte d’étudiant).
+    </p>
     <section class="carte carte-simple sans-impression">
       <h2>${estDistributeur ? '1. Choisir la promotion de l’étudiant' : 'Choisir une promotion'}</h2>
       <div class="grille-3">

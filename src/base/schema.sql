@@ -103,6 +103,9 @@ create table if not exists code_vote (
 -- Un étudiant ne peut avoir qu'UN SEUL code actif à la fois.
 create unique index if not exists un_seul_code_actif
   on code_vote (etudiant_id) where statut = 'actif';
+-- Code annulé par un nettoyage du superviseur (et non remplacé pour perte) :
+-- il ne compte pas dans les « remplacements ».
+alter table code_vote add column if not exists par_nettoyage boolean not null default false;
 
 
 -- ---------------------------------------------------------------------
