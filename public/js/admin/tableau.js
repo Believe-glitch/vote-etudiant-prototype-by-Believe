@@ -1,6 +1,6 @@
 // Tableau de bord des officiels. Les onglets affichés dépendent du rôle :
 //   distributeur : Inscription et codes, Statistiques
-//   superviseur  : Votes, Listes des inscrits, Statistiques, Journal, Nettoyage
+//   superviseur  : Votes, Liste des inscrits au vote, Statistiques, Journal, Nettoyage
 //   observateur  : les mêmes, en lecture seule
 // Distributeur et superviseur peuvent corriger la liste des inscrits.
 // Le serveur vérifie de toute façon le rôle à chaque action.
@@ -15,7 +15,7 @@ import { afficherNettoyage } from './nettoyage.js';
 const ONGLETS = {
   codes: { titre: 'Inscription et codes', roles: ['distributeur'], afficher: afficherListes },
   votes: { titre: 'Votes', roles: ['superviseur', 'observateur'], afficher: afficherVotes },
-  listes: { titre: 'Listes des inscrits', roles: ['superviseur', 'observateur'], afficher: afficherListes },
+  listes: { titre: 'Liste des inscrits au vote', roles: ['superviseur', 'observateur'], afficher: afficherListes },
   statistiques: { titre: 'Statistiques', roles: ['distributeur', 'superviseur', 'observateur'], afficher: afficherStatistiques },
   journal: { titre: 'Journal', roles: ['superviseur', 'observateur'], afficher: afficherJournal },
   nettoyage: { titre: 'Nettoyage', roles: ['superviseur'], afficher: afficherNettoyage },
