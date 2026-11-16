@@ -100,6 +100,67 @@ export function confirmerNettoyage({ titre, texte, mot = 'EFFACER' }) {
   });
 }
 
+// Propose plusieurs choix (un bouton chacun). Renvoie la valeur choisie, ou null.
+//   choix : [{ valeur, libelle, aide, danger }]
+export function choisir({ titre, texte, choix }) {
+  return new Promise((resolve) => {
+    ouvrir(`
+      <h2>${e(titre)}</h2>
+      ${texte ? `<p>${texte}</p>` : ''}
+      <div class="liste-choix">
+        ${choix.map((c) => `
+          <button class="bouton ${c.danger ? 'bouton-contour bouton-choix-danger' : 'bouton-contour'} bouton-choix" data-choix="${e(c.valeur)}" type="button">
+            <span>${e(c.libelle)}</span>${c.aide ? `<span class="petit texte-doux">${e(c.aide)}</span>` : ''}
+          </button>`).join('')}
+      </div>
+      <div class="rangee-boutons section">
+        <button class="bouton bouton-contour" data-reponse="non" type="button">Fermer</button>
+      </div>`);
+    contenu.querySelector('.liste-choix').addEventListener('click', (evenement) => {
+      const bouton = evenement.target.closest('[data-choix]');
+      if (!bouton) return;
+      dialogue.close();
+      resolve(bouton.dataset.choix);
+    });
+    contenu.querySelector('[data-reponse="non"]').addEventListener('click', () => { dialogue.close(); resolve(null); }, { once: true });
+    dialogue.addEventListener('cancel', () => resolve(null), { once: true });
+  });
+}
+
+// Un petit formulaire dans la fenêtre. html : les champs ; preparer(form) :
+// pour brancher des listes ; lire(form) : renvoie les valeurs, ou un texte
+// d'erreur (string) si quelque chose manque. Renvoie les valeurs, ou null.
+export function demanderFormulaire({ titre, texte, html, bouton = 'Enregistrer', danger = false, preparer, lire }) {
+  return new Promise((resolve) => {
+    ouvrir(`
+      <h2>${e(titre)}</h2>
+      ${texte ? `<p>${texte}</p>` : ''}
+      <form id="formulaire-dialogue" novalidate>
+        ${html}
+        <div id="message-dialogue"></div>
+        <div class="rangee-boutons">
+          <button class="bouton ${danger ? 'bouton-danger' : 'bouton-accent'}" type="submit">${e(bouton)}</button>
+          <button class="bouton bouton-contour" data-reponse="non" type="button">Annuler</button>
+        </div>
+      </form>`);
+    const formulaire = contenu.querySelector('#formulaire-dialogue');
+    if (preparer) preparer(formulaire);
+    formulaire.querySelector('input, select')?.focus();
+    formulaire.addEventListener('submit', (evenement) => {
+      evenement.preventDefault();
+      const valeurs = lire(formulaire);
+      if (typeof valeurs === 'string') {
+        formulaire.querySelector('#message-dialogue').innerHTML = `<div class="message message-erreur" role="alert">${e(valeurs)}</div>`;
+        return;
+      }
+      dialogue.close();
+      resolve(valeurs);
+    });
+    contenu.querySelector('[data-reponse="non"]').addEventListener('click', () => { dialogue.close(); resolve(null); }, { once: true });
+    dialogue.addEventListener('cancel', () => resolve(null), { once: true });
+  });
+}
+
 // Affiche un contenu avec un bouton pour fermer.
 export function montrer(html, boutonFermer = 'Fermer') {
   return new Promise((resolve) => {

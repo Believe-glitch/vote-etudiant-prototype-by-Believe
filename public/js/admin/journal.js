@@ -9,6 +9,10 @@ const ACTIONS = {
   etudiant_inscrit_code_remis: 'Étudiant inscrit et code remis',
   donnees_demo_codes: 'Codes de démonstration créés',
   code_remplace: 'Code remplacé',
+  code_annule: 'Code annulé',
+  etudiant_corrige: 'Nom d’un étudiant corrigé',
+  etudiant_change_promotion: 'Étudiant changé de promotion',
+  etudiant_retire: 'Étudiant retiré de la liste',
   candidat_ajoute: 'Candidat ajouté',
   candidat_retire: 'Candidat retiré',
   photo_candidat_changee: 'Photo de candidat changée',
@@ -31,7 +35,9 @@ const ACTIONS = {
 // Résumé lisible des détails (sans jargon technique).
 function resume(details, nomsSites) {
   const morceaux = [];
-  if (details.nom) morceaux.push(details.nom);
+  if (details.avant) morceaux.push(`avant : ${details.avant}`);
+  if (details.nom) morceaux.push(details.avant ? `après : ${details.nom}` : details.nom);
+  if (details.nouvellePromotion) morceaux.push(`vers ${details.nouvellePromotion}`);
   if (details.matricule) morceaux.push(`matricule ${details.matricule}`);
   if (details.campusId && nomsSites.has(details.campusId)) morceaux.push(`site de ${nomsSites.get(details.campusId)}`);
   if (details.motif) morceaux.push(`motif : ${details.motif}`);
