@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#06274a">
+  <meta name="theme-color" content="#0b4fa3">
   <meta name="robots" content="noindex">
   <title>Tableau de bord – URKIMeVote</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/images/icone-180.png">
+  <script src="/js/theme.js"></script>
   <link rel="stylesheet" href="/css/style.css">
   <script type="module" src="/js/admin/tableau.js"></script>
 </head>
@@ -18,8 +19,11 @@
         <span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span>
         <span class="logo-suffixe">Officiels</span>
       </a>
-      <span id="qui" class="petit"></span>
-      <button id="deconnexion" class="bouton bouton-accent bouton-petit" type="button">Se déconnecter</button>
+      <div class="entete-officiels">
+        <span id="qui" class="petit"></span>
+        <button class="bouton-theme" type="button" aria-pressed="false" aria-label="Passer en mode sombre"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span class="theme-texte">Mode sombre</span><span class="interrupteur" aria-hidden="true"></span></button>
+        <button id="deconnexion" class="bouton bouton-entete bouton-petit" type="button">Se déconnecter</button>
+      </div>
     </div>
   </header>
 

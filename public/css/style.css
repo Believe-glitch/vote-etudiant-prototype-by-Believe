@@ -2,9 +2,16 @@
    Styles du site URKIMeVote
    Pensés d'abord pour le téléphone : on agrandit ensuite pour l'ordinateur.
 
-   Couleurs : bleu marine et bleu roi (les bleus de l'université), avec
-   l'or comme couleur d'accent. Pour changer une couleur partout sur le
-   site, il suffit de modifier sa variable ci-dessous.
+   Couleurs :
+     - le bleu et le blanc dominent (les bleus de l'université) ;
+     - le noir sert aux boutons principaux et au texte ;
+     - l'or est réservé au logo, à l'Espace officiels et aux votes OUVERTS,
+       pour que le regard aille tout de suite au bon endroit.
+
+   Mode clair et mode sombre : toutes les couleurs sont des variables.
+   Le mode sombre ne fait que changer leurs valeurs (voir plus bas,
+   [data-theme="sombre"]). Le fichier js/theme.js choisit le mode :
+   celui du téléphone par défaut, ou celui choisi avec le bouton ◐.
 
    Polices : celles du téléphone ou de l'ordinateur pour le texte (rien à
    télécharger), et Poppins pour les titres et le logo (un seul petit
@@ -19,25 +26,87 @@
   font-display: swap;   /* le texte s'affiche tout de suite, la police arrive ensuite */
 }
 
+/* --- Les couleurs du mode clair ----------------------------------------- */
+
 :root {
-  --encre: #06274a;          /* bleu marine : en-tête, titres, texte principal */
-  --royal: #0b4fa3;          /* bleu roi : liens, éléments mis en avant */
-  --encre-douce: #46556b;    /* texte secondaire */
-  --papier: #f3f6fb;         /* fond de page */
-  --papier-2: #e3eaf5;       /* fond alterné */
+  color-scheme: light;
+  --fond: #e6effb;           /* fond de page : bleu très clair */
+  --fond-2: #d8e5f7;         /* fond alterné, jauges, cases vides */
   --carte: #ffffff;          /* fond des cartes */
-  --accent: #f2b705;         /* or : boutons principaux, logo, barres */
-  --accent-fonce: #0b4fa3;   /* couleur d'accent lisible sur fond clair */
-  --ok: #1f7a4d;             /* vert : réussite */
+  --champ: #f4f8fd;          /* fond des champs de saisie */
+  --texte: #0b1220;          /* texte principal (presque noir) */
+  --texte-doux: #475569;     /* texte secondaire */
+  --bleu: #0b4fa3;           /* bleu roi : chiffres, barres, liserés */
+  --bleu-texte: #0b4fa3;     /* liens et titres de section */
+  --bleu-fond: #e3edfb;      /* fond bleu pâle (sélection, pastilles) */
+  --barre: #0b4fa3;          /* barre du haut */
+  --barre-texte: #dbe7f8;    /* liens de la barre du haut */
+  --bandeau: #06274a;        /* bandeau bleu marine (accueil, résultats) */
+  --bandeau-texte: #c7d6ee;
+  --pied: #06274a;           /* pied de page */
+  --pied-bas: #041a33;
+  --pied-texte: #c7d6ee;
+  --menu: #0b1220;           /* menu déroulant du téléphone */
+  --noir: #0b1220;           /* boutons principaux */
+  --sur-noir: #ffffff;       /* texte des boutons principaux */
+  --or: #f2b705;             /* l'or : logo, votes ouverts */
+  --or-texte: #7a5a00;       /* texte doré lisible sur fond clair */
+  --or-fond: #fdf3d2;
+  --ok: #1f7a4d;
   --ok-fond: #e3f2e9;
-  --alerte: #b42318;         /* rouge : erreur */
+  --ok-texte: #11502f;
+  --alerte: #b42318;
   --alerte-fond: #fdecea;
-  --trait: #d3dceb;
+  --alerte-texte: #7a1a12;
+  --trait: #cddcf2;          /* bordures */
+  --trait-fort: #9fb6d8;
+  --ombre: 0 1px 2px rgba(6, 39, 74, 0.06), 0 6px 20px rgba(6, 39, 74, 0.08);
+  --ombre-forte: 0 2px 4px rgba(6, 39, 74, 0.08), 0 12px 28px rgba(6, 39, 74, 0.14);
+  --voile: rgba(6, 39, 74, 0.6);      /* fond derrière les fenêtres */
   --rayon: 16px;
-  --ombre: 0 1px 2px rgba(6, 39, 74, 0.06), 0 6px 20px rgba(6, 39, 74, 0.07);
   --police: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --police-titre: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --police-code: ui-monospace, "Cascadia Mono", "Consolas", "Liberation Mono", monospace;
+}
+
+/* --- Les mêmes variables en mode sombre ---------------------------------
+   Le contenu est plus sombre que la barre du haut et le pied de page :
+   la page reste « encadrée » en haut et en bas. */
+
+:root[data-theme="sombre"] {
+  color-scheme: dark;
+  --fond: #0a1020;
+  --fond-2: #1b2539;
+  --carte: #151d2e;
+  --champ: #0b1220;
+  --texte: #e2e8f0;
+  --texte-doux: #94a3b8;
+  --bleu: #3b82f6;
+  --bleu-texte: #60a5fa;
+  --bleu-fond: #16264a;
+  --barre: #0f1d36;
+  --barre-texte: #b9c8de;
+  --bandeau: #0a2a57;
+  --bandeau-texte: #b9c8de;
+  --pied: #102445;
+  --pied-bas: #0b1a33;
+  --pied-texte: #a9bbd6;
+  --menu: #070b14;
+  --noir: #f1f5f9;           /* en sombre, le bouton principal devient blanc */
+  --sur-noir: #0b1220;
+  --or-texte: #f7d36b;
+  --or-fond: #3a2f0b;
+  --ok: #4ade80;
+  --ok-fond: #12301f;
+  --ok-texte: #bbf7d0;
+  --alerte: #f05252;
+  --alerte-fond: #3b1414;
+  --alerte-texte: #fecaca;
+  --trait: #243049;
+  --trait-fort: #3d5a85;
+  --ombre: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
+  --ombre-forte: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.4);
+  --voile: rgba(0, 0, 0, 0.7);
 }
 
 * { box-sizing: border-box; }
@@ -49,11 +118,11 @@ body {
   font-family: var(--police);
   font-size: 17px;
   line-height: 1.55;
-  color: var(--encre);
-  background: var(--papier);
+  color: var(--texte);
+  background: var(--fond);
 }
 
-a { color: var(--accent-fonce); }
+a { color: var(--bleu-texte); }
 img { max-width: 100%; display: block; }
 h1, h2, h3 { font-family: var(--police-titre); font-weight: 600; line-height: 1.2; margin: 0 0 0.5em; }
 h1 { font-size: 1.9rem; }
@@ -62,47 +131,133 @@ h3 { font-size: 1.08rem; }
 p { margin: 0 0 0.8em; }
 
 .cache { display: none !important; }
-.texte-doux { color: var(--encre-douce); }
+.texte-doux { color: var(--texte-doux); }
 .petit { font-size: 0.9rem; }
 
-/* --- En-tête et navigation ------------------------------------------ */
+/* --- Barre du haut ----------------------------------------------------- */
 
 .entete {
-  background: var(--encre);
-  color: var(--papier);
-  border-bottom: 3px solid var(--accent);
+  background: var(--barre);
+  color: #fff;
+  border-bottom: 3px solid var(--or);
+  position: relative;
+  z-index: 10;
 }
 .entete-contenu {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 1rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 1.2rem;
 }
 .logo {
-  color: var(--papier);
+  color: #fff;
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.6rem;
   margin-right: auto;
 }
-.navigation { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; }
+
+/* Petit écusson à côté du logo : seulement sur téléphone et tablette.
+   Sur ordinateur, le grand écusson du bandeau suit juste en dessous. */
+.entete-ecusson { background: #fff; border-radius: 8px; padding: 2px 3px; display: inline-flex; flex: none; }
+.entete-ecusson img { height: 30px; width: auto; }
+
+/* Le bouton « trois barres » (menu du téléphone). */
+.bouton-menu {
+  display: inline-flex; flex-direction: column; justify-content: center; gap: 5px;
+  width: 44px; height: 44px; padding: 0 11px;
+  background: transparent; border: 0; border-radius: 10px; cursor: pointer;
+}
+.bouton-menu span { display: block; height: 2.5px; border-radius: 2px; background: #fff; transition: transform 0.2s ease, opacity 0.2s ease; }
+.bouton-menu[aria-expanded="true"] span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.bouton-menu[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.bouton-menu[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+/* Le menu. Sur téléphone : un panneau sombre qui se déroule sous la barre. */
+.navigation {
+  display: none;
+  position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--menu);
+  border-bottom: 3px solid var(--or);
+  padding: 0.6rem 1rem 1rem;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
+}
+.navigation.ouvert { display: block; }
+.navigation-liens, .navigation-actions { display: flex; flex-direction: column; gap: 0.15rem; }
+.navigation-actions { border-top: 1px solid rgba(255, 255, 255, 0.12); margin-top: 0.5rem; padding-top: 0.5rem; }
 .navigation a {
-  color: #c9d6ea; text-decoration: none; padding: 0.2rem 0;
-  border-bottom: 2px solid transparent;
+  color: #e2e8f0; text-decoration: none;
+  padding: 0.7rem 0.8rem; border-radius: 10px;
 }
-.navigation a:hover, .navigation a[aria-current="page"] {
-  color: #fff; border-bottom-color: var(--accent);
+.navigation a:hover { background: rgba(255, 255, 255, 0.06); }
+.navigation a[aria-current="page"] { background: #0b4fa3; color: #fff; }
+.navigation .lien-officiels { color: var(--or); }
+
+/* Bouton clair / sombre. Sur téléphone, il s'écrit « Mode sombre » avec un
+   interrupteur ; sur ordinateur, ce n'est qu'une petite icône ronde. */
+.bouton-theme {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+  font: inherit; color: #e2e8f0; background: transparent; cursor: pointer;
+  border: 0; border-radius: 10px; padding: 0.7rem 0.8rem; text-align: left;
 }
+.bouton-theme:hover { background: rgba(255, 255, 255, 0.06); }
+.bouton-theme svg { width: 18px; height: 18px; flex: none; }
+.theme-texte { flex: 1; }
+.interrupteur {
+  width: 40px; height: 22px; border-radius: 999px; background: #334155; position: relative; flex: none;
+  transition: background 0.2s ease;
+}
+.interrupteur::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transition: transform 0.2s ease;
+}
+.bouton-theme[aria-pressed="true"] .interrupteur { background: #0b4fa3; }
+.bouton-theme[aria-pressed="true"] .interrupteur::after { transform: translateX(18px); }
+
+/* Sur ordinateur : 5 liens au centre, l'Espace officiels et le mode à droite. */
+@media (min-width: 960px) {
+  .entete-ecusson, .bouton-menu { display: none; }
+  .entete-contenu { flex-wrap: nowrap; padding: 0.75rem 1rem; }
+  .navigation, .navigation.ouvert {
+    display: flex; align-items: center; justify-content: space-between; flex: 1; gap: 1.5rem;
+    position: static; background: none; border: 0; padding: 0; box-shadow: none;
+  }
+  .navigation-liens { flex-direction: row; gap: 1.5rem; margin: 0 auto; }
+  .navigation-actions { flex-direction: row; align-items: center; gap: 0.8rem; border: 0; margin: 0; padding: 0; }
+  .navigation a { color: var(--barre-texte); padding: 0.2rem 0; border-radius: 0; border-bottom: 2px solid transparent; }
+  .navigation a:hover { background: none; color: #fff; }
+  .navigation a[aria-current="page"] { background: none; color: #fff; border-bottom-color: var(--or); }
+  .navigation .lien-officiels {
+    color: var(--or); border: 1.5px solid var(--or); border-radius: 8px; padding: 0.3rem 0.8rem;
+  }
+  .navigation .lien-officiels:hover, .navigation .lien-officiels[aria-current="page"] {
+    background: var(--or); color: #0b1220; border-bottom-color: var(--or);
+  }
+  .bouton-theme {
+    width: 38px; height: 38px; padding: 0; justify-content: center; border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+  .bouton-theme:hover { background: rgba(255, 255, 255, 0.1); }
+  .theme-texte, .interrupteur { display: none; }
+}
+
+/* Barre du haut de l'espace officiels : logo, qui est connecté, mode, déconnexion. */
+.entete-officiels { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.entete-officiels .bouton-theme {
+  width: 38px; height: 38px; padding: 0; justify-content: center; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.entete-officiels .theme-texte, .entete-officiels .interrupteur { display: none; }
 
 /* --- Le logo URKIMeVote ---------------------------------------------------
    Le nom est écrit en lettres ; le V est un petit dessin (SVG) : une coche
-   qui sort d'un téléphone. Le « e » et le V ont la couleur d'accent.
-   Sur fond clair, ajouter la classe « sur-clair » : l'or devient bleu roi,
-   parce que l'or se lit mal sur du blanc. */
+   qui sort d'un téléphone. Le « e », le téléphone et le V sont en or, sur
+   tous les fonds. --logo-fond est la couleur du fond : elle détache le V
+   du téléphone. */
 
 .logo-mot {
   display: inline-flex;
@@ -112,9 +267,9 @@ p { margin: 0 0 0.8em; }
   font-size: 1.4rem;
   line-height: 1;
   letter-spacing: 0.02em;
-  color: var(--papier);
-  --logo-accent: var(--accent);
-  --logo-fond: var(--encre);       /* couleur du fond, pour détacher le V du téléphone */
+  color: #fff;
+  --logo-accent: var(--or);
+  --logo-fond: var(--barre);
 }
 .logo-accent { color: var(--logo-accent); }
 .logo-tel { height: 1.8em; width: auto; flex: none; margin: -0.3em 0.02em 0 0.06em; }
@@ -125,12 +280,13 @@ p { margin: 0 0 0.8em; }
 .tel-halo { stroke: var(--logo-fond); stroke-width: 18; }
 .tel-v { stroke: var(--logo-accent); stroke-width: 8.5; }
 
-.logo-mot.sur-clair { color: var(--encre); --logo-accent: var(--royal); --logo-fond: var(--carte); }
+.pied .logo-mot { --logo-fond: var(--pied); }
+.logo-mot.sur-clair { color: var(--texte); --logo-fond: var(--carte); }
 .logo-mot.logo-grand { font-size: 2.4rem; margin: 0.4rem 0 1rem; }
 
 .logo-suffixe {
   font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--accent); border: 1.5px solid var(--accent); border-radius: 999px;
+  color: var(--or); border: 1.5px solid var(--or); border-radius: 999px;
   padding: 0.1rem 0.6rem;
 }
 
@@ -143,12 +299,13 @@ main {
 }
 .section { margin-top: 2rem; }
 
-/* Petit trait doré sous les titres de section. */
+/* Les titres de section sont en bleu, avec un petit trait bleu dessous. */
+main > section.section:not(.carte):not(.bandeau) > h2 { color: var(--bleu-texte); }
 main > section.section:not(.carte):not(.bandeau) > h2::after {
   content: "";
   display: block;
   width: 44px; height: 4px; border-radius: 2px;
-  background: var(--accent);
+  background: var(--bleu);
   margin-top: 0.45rem;
 }
 
@@ -165,46 +322,59 @@ main > section.section:not(.carte):not(.bandeau) > h2::after {
   border-radius: var(--rayon);
   box-shadow: var(--ombre);
   padding: 1.25rem;
-  border-top: 4px solid var(--accent);
+  border: 1px solid var(--trait);
+  border-top: 3px solid var(--bleu);
 }
-.carte-simple { border-top: none; }
+.carte-simple { border-top: 1px solid var(--trait); }
 
 /* Une carte entière cliquable (liste des résultats). */
 a.carte { display: block; color: inherit; text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-a.carte:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(6, 39, 74, 0.08), 0 12px 28px rgba(6, 39, 74, 0.12); }
+a.carte:hover { transform: translateY(-2px); box-shadow: var(--ombre-forte); }
+
+/* Un vote OUVERT : la carte est encadrée d'or (une seule couleur forte
+   sur la page, pour que le regard y aille tout de suite). */
+.carte:not(.scrutin-admin):has(.pastille-ouvert),
+.seance-admin:has(.pastille-ouvert) {
+  border: 2px solid var(--or);
+}
 
 .bandeau {
-  background: linear-gradient(135deg, var(--encre) 0%, var(--royal) 100%);
+  background: var(--bandeau);
   color: #fff;
   border-radius: var(--rayon);
   padding: 1.5rem;
 }
 .bandeau h1, .bandeau h2, .bandeau h3 { color: #fff; }
-.bandeau p { color: #dbe6f5; }
-.bandeau .pastille-devoile { color: var(--encre); }
+.bandeau p { color: var(--bandeau-texte); }
+.sur-titre { color: var(--or) !important; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem !important; }
 
 /* Le grand bandeau de la page d'accueil, avec l'écusson de l'université.
    L'écusson est posé sur une carte blanche : ses lauriers sont noirs et
-   disparaîtraient sur le fond bleu. */
-.hero { display: grid; gap: 1.25rem; padding: 1.5rem; align-items: center; }
+   disparaîtraient sur le fond bleu. Sur téléphone, il est dans la barre
+   du haut : on ne le répète pas ici. */
+.hero { display: grid; gap: 1.25rem; padding: 1.5rem 1.5rem 3.2rem; align-items: center; }
 .hero-ecusson {
-  justify-self: start;
+  display: none;
   background: #fff; border-radius: 18px; padding: 0.7rem 0.9rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
 }
-.hero-ecusson img { height: 96px; width: auto; }
+.hero-ecusson img { height: 150px; width: auto; }
 .hero-texte p:last-child { margin-bottom: 0; max-width: 46ch; }
-@media (min-width: 720px) {
-  .hero { grid-template-columns: 1fr auto; padding: 2.5rem; gap: 2.5rem; }
-  .hero-ecusson { order: 2; justify-self: end; padding: 1.1rem 1.4rem; }
-  .hero-ecusson img { height: 190px; }
+/* Les deux cartes de l'accueil « mordent » sur le bandeau. */
+.hero + .grille-2 { margin-top: -2rem; position: relative; padding: 0 0.6rem; }
+@media (min-width: 960px) {
+  .hero { grid-template-columns: auto 1fr; padding: 2.2rem 2.5rem 4rem; gap: 2.5rem; }
+  .hero-ecusson { display: block; }
+  .hero + .grille-2 { padding: 0 1.5rem; margin-top: -2.6rem; }
 }
+.hero + .grille-2 .carte { display: flex; flex-direction: column; }
+.hero + .grille-2 .rangee-boutons, .hero + .grille-2 form > .bouton { margin-top: auto; }
 
 .etape-numero {
   width: 44px; height: 44px; border-radius: 50%;
   display: grid; place-items: center;
   font-family: var(--police-titre); font-size: 1.25rem; font-weight: 600; line-height: 1;
-  background: var(--accent); color: var(--encre);
+  background: var(--bleu); color: #fff;
   margin-bottom: 0.8rem;
 }
 
@@ -217,16 +387,17 @@ input[type="text"], input[type="password"], input[type="number"], input[type="se
   padding: 0.7rem 0.8rem;
   border: 2px solid var(--trait);
   border-radius: 10px;
-  background: #fff;
-  color: var(--encre);
+  background: var(--champ);
+  color: var(--texte);
 }
+input::placeholder { color: var(--texte-doux); opacity: 0.75; }
 input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible {
-  outline: 3px solid var(--royal);
+  outline: 3px solid var(--bleu);
   outline-offset: 2px;
 }
 /* Sur les fonds bleus, le contour de sélection est doré pour rester visible. */
 .entete a:focus-visible, .entete button:focus-visible, .bandeau a:focus-visible, .bandeau button:focus-visible {
-  outline-color: var(--accent);
+  outline-color: var(--or);
 }
 .champ { margin-bottom: 0.9rem; }
 .champ-code {
@@ -236,47 +407,63 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
   text-transform: uppercase;
 }
 
+/* Les boutons principaux sont noirs (blancs en mode sombre). */
 .bouton {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
   font: inherit; font-weight: 700;
   padding: 0.7rem 1.2rem;
   border-radius: 10px;
-  border: 2px solid var(--encre);
-  background: var(--encre);
-  color: #fff;
+  border: 2px solid var(--noir);
+  background: var(--noir);
+  color: var(--sur-noir);
   cursor: pointer;
   text-decoration: none;
   min-height: 46px;
-  transition: filter 0.15s ease, transform 0.1s ease;
+  transition: filter 0.15s ease, transform 0.1s ease, background 0.15s ease;
 }
-.bouton:hover { filter: brightness(1.12); }
+.bouton:hover { filter: brightness(1.25); }
+:root[data-theme="sombre"] .bouton:hover { filter: brightness(0.9); }
 .bouton:active { transform: translateY(1px); }
 .bouton:disabled { opacity: 0.5; cursor: not-allowed; }
-.bouton-accent { background: var(--accent); border-color: var(--accent); color: var(--encre); box-shadow: 0 2px 0 #c99700; }
-.bouton-contour { background: transparent; color: var(--encre); }
+.bouton-accent { /* même style que le bouton principal */ }
+.bouton-contour { background: transparent; color: var(--texte); border-color: var(--texte); }
+.bouton-contour:hover { background: var(--bleu-fond); filter: none; }
 .bouton-danger { background: var(--alerte); border-color: var(--alerte); color: #fff; }
-.bouton-petit { padding: 0.35rem 0.7rem; min-height: 36px; font-size: 0.9rem; box-shadow: none; }
+.bouton-petit { padding: 0.35rem 0.7rem; min-height: 36px; font-size: 0.9rem; }
 .bouton-large { width: 100%; }
 .rangee-boutons { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .bouton + p { margin-top: 0.9rem; }   /* petit texte d'aide placé sous un bouton */
+
+/* Sur les bandeaux et la barre du haut (fonds bleus), les boutons sont
+   blancs, ou en contour blanc : le noir ne se verrait pas. */
+.bandeau .bouton { background: #fff; border-color: #fff; color: #0b1220; }
+.bandeau .bouton-contour, .entete .bouton-entete { background: transparent; border-color: rgba(255, 255, 255, 0.7); color: #fff; }
+.bandeau .bouton:hover, .entete .bouton-entete:hover { filter: none; background: rgba(255, 255, 255, 0.85); color: #0b1220; }
 
 /* --- Messages --------------------------------------------------------- */
 
 .message {
   padding: 0.8rem 1rem; border-radius: 10px; margin: 0.8rem 0;
-  border-left: 5px solid var(--royal); background: var(--papier-2);
+  border-left: 5px solid var(--bleu); background: var(--bleu-fond);
 }
-.message-erreur { border-left-color: var(--alerte); background: var(--alerte-fond); color: #7a1a12; }
-.message-ok { border-left-color: var(--ok); background: var(--ok-fond); color: #11502f; }
+.message-erreur { border-left-color: var(--alerte); background: var(--alerte-fond); color: var(--alerte-texte); }
+.message-ok { border-left-color: var(--ok); background: var(--ok-fond); color: var(--ok-texte); }
 
 .pastille {
   display: inline-block; font-size: 0.8rem; font-weight: 700;
   padding: 0.15rem 0.65rem; border-radius: 999px;
-  background: var(--papier-2); color: var(--encre-douce);
+  background: var(--fond-2); color: var(--texte-doux);
 }
-.pastille-ouvert { background: var(--ok-fond); color: var(--ok); }
-.pastille-ferme { background: var(--papier-2); color: var(--encre); }
-.pastille-devoile { background: var(--accent); color: var(--encre); }
+/* Vote ouvert : pastille dorée avec un point qui « respire ». */
+.pastille-ouvert { background: var(--or-fond); color: var(--or-texte); }
+.pastille-ouvert::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--or); margin-right: 0.4rem; vertical-align: 1px;
+  animation: respirer 1.6s ease-in-out infinite;
+}
+@keyframes respirer { 50% { opacity: 0.35; } }
+.pastille-ferme { background: var(--fond-2); color: var(--texte); }
+.pastille-devoile { background: var(--bleu); color: #fff; }
 
 /* --- Candidats -------------------------------------------------------- */
 
@@ -285,20 +472,20 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 
 .candidat {
   display: flex; align-items: center; gap: 0.8rem;
-  background: #fff; border: 2px solid var(--trait); border-radius: 12px;
+  background: var(--carte); border: 2px solid var(--trait); border-radius: 12px;
   padding: 0.7rem;
 }
 .candidat-nom { font-weight: 700; }
-.candidat-slogan { font-size: 0.9rem; color: var(--encre-douce); margin: 0; }
+.candidat-slogan { font-size: 0.9rem; color: var(--texte-doux); margin: 0; }
 
 .photo {
   width: 64px; height: 64px; border-radius: 50%; flex: none;
-  object-fit: cover; background: var(--papier-2);
+  object-fit: cover; background: var(--fond-2);
 }
 .photo-initiales {
   display: grid; place-items: center;
-  font-family: var(--police-titre); font-weight: 600; font-size: 1.2rem; color: var(--royal);
-  background: var(--papier-2);
+  font-family: var(--police-titre); font-weight: 600; font-size: 1.2rem; color: var(--bleu-texte);
+  background: var(--bleu-fond);
 }
 .photo-grande { width: 96px; height: 96px; }
 
@@ -306,10 +493,10 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .fieldset-nu { border: none; padding: 0; margin: 0; min-width: 0; }
 .choix input { position: absolute; opacity: 0; pointer-events: none; }
 .choix { position: relative; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
-.choix:hover { border-color: #9fb6d8; }
+.choix:hover { border-color: var(--trait-fort); }
 .choix .candidat-nom, .choix .candidat-slogan { display: block; }
-.choix:has(input:checked) { border-color: var(--royal); background: #eef4fd; box-shadow: 0 0 0 3px rgba(11, 79, 163, 0.22); }
-.choix:has(input:focus-visible) { outline: 3px solid var(--royal); outline-offset: 2px; }
+.choix:has(input:checked) { border-color: var(--bleu); background: var(--bleu-fond); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
+.choix:has(input:focus-visible) { outline: 3px solid var(--bleu); outline-offset: 2px; }
 
 /* --- Votes en cours et décompte ----------------------------------------- */
 
@@ -317,15 +504,18 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
   font-family: var(--police-code);
   font-size: 1.6rem; font-weight: 700;
   font-variant-numeric: tabular-nums;
+  color: var(--bleu-texte);
 }
+.bandeau .decompte { color: #fff; }
 .jauge {
-  height: 10px; border-radius: 999px; background: var(--papier-2); overflow: hidden;
+  height: 10px; border-radius: 999px; background: var(--fond-2); overflow: hidden;
 }
 .bandeau .jauge { background: rgba(255, 255, 255, 0.25); }
 .jauge-remplissage {
-  height: 100%; width: 0; background: var(--accent); border-radius: 999px;
+  height: 100%; width: 0; background: var(--bleu); border-radius: 999px;
   transition: width 0.6s ease;
 }
+.bandeau .jauge-remplissage { background: #fff; }
 
 /* --- Résultats --------------------------------------------------------- */
 
@@ -343,44 +533,47 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .barre-ligne.visible { opacity: 1; transform: none; }
 .barre-entete { display: flex; justify-content: space-between; gap: 0.5rem; font-weight: 700; }
 .barre-voix { font-variant-numeric: tabular-nums; }
-.barre-fond { height: 22px; border-radius: 8px; background: var(--papier-2); overflow: hidden; margin-top: 0.3rem; }
-.barre-remplissage { height: 100%; width: 0; background: #7f9cc6; border-radius: 8px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
-.barre-ligne.gagnant .barre-remplissage { background: var(--accent); }
-.barre-ligne.gagnant .barre-fond { box-shadow: 0 0 0 2px var(--accent); }
+.barre-fond { height: 22px; border-radius: 8px; background: var(--fond-2); overflow: hidden; margin-top: 0.3rem; }
+.barre-remplissage { height: 100%; width: 0; background: var(--trait-fort); border-radius: 8px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.barre-ligne.gagnant .barre-remplissage { background: var(--bleu); }
+.barre-ligne.gagnant .barre-fond { box-shadow: 0 0 0 2px var(--bleu); }
+/* Le badge de l'élu : noir (blanc en mode sombre). */
 .badge-place {
   display: inline-block; margin-left: 0.4rem; font-size: 0.8rem;
-  background: var(--accent); color: var(--encre); border-radius: 999px; padding: 0.1rem 0.6rem;
+  background: var(--noir); color: var(--sur-noir); border-radius: 6px; padding: 0.1rem 0.55rem;
   opacity: 0; transform: scale(0.6); transition: opacity 0.4s ease, transform 0.4s ease;
 }
 .badge-place.visible { opacity: 1; transform: none; }
 .photo.petite { width: 56px; height: 56px; font-size: 1rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  .barre-ligne, .barre-remplissage, .badge-place, .jauge-remplissage, a.carte, .bouton, .choix { transition: none; }
+  .barre-ligne, .barre-remplissage, .badge-place, .jauge-remplissage, a.carte, .bouton, .choix,
+  .bouton-menu span, .interrupteur, .interrupteur::after { transition: none; }
+  .pastille-ouvert::before { animation: none; }
 }
 
 /* --- Tableaux ----------------------------------------------------------- */
 
 .tableau-conteneur { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; }
-th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--papier-2); vertical-align: middle; }
-th { background: var(--encre); color: #fff; font-weight: 600; font-size: 0.9rem; }
+table { width: 100%; border-collapse: collapse; background: var(--carte); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--trait); vertical-align: middle; }
+th { background: var(--bandeau); color: #fff; font-weight: 600; font-size: 0.9rem; }
 td.nombre, th.nombre { text-align: right; font-variant-numeric: tabular-nums; }
-tr.total td { font-weight: 700; background: var(--papier-2); }
+tr.total td { font-weight: 700; background: var(--bleu-fond); }
 
 /* --- Fenêtres de dialogue ------------------------------------------------- */
 
 dialog {
-  border: none; border-radius: var(--rayon); padding: 1.4rem;
+  border: 1px solid var(--trait); border-radius: var(--rayon); padding: 1.4rem;
   max-width: min(520px, 92vw); width: 100%;
-  box-shadow: 0 20px 60px rgba(6, 39, 74, 0.35);
-  color: var(--encre); background: var(--carte);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  color: var(--texte); background: var(--carte);
 }
-dialog::backdrop { background: rgba(6, 39, 74, 0.6); }
+dialog::backdrop { background: var(--voile); }
 .code-affiche {
   font-family: var(--police-code); font-size: 2rem; font-weight: 800;
   letter-spacing: 0.08em; text-align: center;
-  padding: 1rem; border-radius: 12px; background: var(--encre); color: var(--accent);
+  padding: 1rem; border-radius: 12px; background: #06274a; color: var(--or);
   margin: 1rem 0; word-break: break-all;
 }
 
@@ -390,9 +583,10 @@ dialog::backdrop { background: rgba(6, 39, 74, 0.6); }
 .onglet {
   font: inherit; font-weight: 700; cursor: pointer;
   padding: 0.5rem 1rem; border-radius: 999px;
-  border: 2px solid var(--encre); background: transparent; color: var(--encre);
+  border: 2px solid var(--trait-fort); background: var(--carte); color: var(--texte);
 }
-.onglet[aria-selected="true"] { background: var(--encre); color: #fff; }
+.onglet:hover { border-color: var(--bleu); }
+.onglet[aria-selected="true"] { background: var(--bleu); border-color: var(--bleu); color: #fff; }
 
 .scrutin-admin { margin-bottom: 1.2rem; }
 .seance-admin {
@@ -402,24 +596,32 @@ dialog::backdrop { background: rgba(6, 39, 74, 0.6); }
 .ligne-flex { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: space-between; }
 .champ-duree { width: 90px !important; }
 
-/* Page de connexion des officiels. */
-.connexion-officiels { max-width: 460px; margin: 1rem auto 0; }
-.connexion-ecusson { height: 104px; width: auto; margin: 0 auto 1rem; }
-.connexion-officiels h1 { font-size: 1.7rem; text-align: center; }
-.connexion-officiels h1 + p { text-align: center; }
+/* Page de connexion des officiels : une carte sombre, pour marquer que
+   c'est un espace à part. */
+.connexion-officiels {
+  max-width: 460px; margin: 1rem auto 0;
+  background: #0b1220; color: #e2e8f0; border: 1px solid #243049; border-top: 3px solid var(--or);
+}
+.connexion-officiels h1 { font-size: 1.7rem; text-align: center; color: #fff; }
+.connexion-officiels h1 + p { text-align: center; color: #94a3b8; }
+.connexion-officiels input { background: #151d2e; border-color: #2b3a57; color: #e2e8f0; }
+.connexion-officiels .bouton { background: #0b4fa3; border-color: #0b4fa3; color: #fff; }
+.connexion-officiels .texte-doux { color: #94a3b8; }
+.connexion-officiels a { color: #93c5fd; }
+.connexion-ecusson { height: 104px; width: auto; margin: 0 auto 1rem; background: #fff; border-radius: 14px; padding: 6px 8px; }
 
 /* --- Pied de page ----------------------------------------------------------- */
 
 .pied {
   margin-top: 2rem;
-  background: var(--encre);
-  color: #c9d6ea;
+  background: var(--pied);
+  color: var(--pied-texte);
   font-size: 0.92rem;
-  border-top: 3px solid var(--accent);
+  border-top: 3px solid var(--or);
 }
 .pied a { color: #fff; text-decoration: none; }
-.pied a:hover { color: var(--accent); }
-.pied a:focus-visible { outline-color: var(--accent); }
+.pied a:hover { color: var(--or); }
+.pied a:focus-visible { outline-color: var(--or); }
 .pied p { margin: 0; }
 .pied-contenu {
   max-width: 1080px; margin: 0 auto; padding: 2rem 1rem 1.5rem;
@@ -430,50 +632,54 @@ dialog::backdrop { background: rgba(6, 39, 74, 0.6); }
 }
 .pied-marque p { margin-top: 0.8rem; max-width: 34ch; }
 .pied-colonne { display: flex; flex-direction: column; gap: 0.45rem; align-items: flex-start; }
-.pied-titre { font-family: var(--police-titre); font-weight: 600; color: #fff; margin-bottom: 0.2rem !important; }
+.pied-titre { font-family: var(--police-titre); font-weight: 600; color: var(--or); margin-bottom: 0.2rem !important; }
 .pied-titre-suite { margin-top: 0.9rem !important; }
 .pied-universite { display: flex; align-items: center; gap: 0.7rem; }
-/* L'écusson est posé sur un rond blanc : ses lauriers noirs restent visibles. */
+/* L'écusson est posé sur un fond blanc : ses lauriers noirs restent visibles. */
 .pied-ecusson-fond { background: #fff; border-radius: 12px; padding: 4px 6px; display: inline-flex; flex: none; }
 .pied-ecusson { height: 46px; width: auto; }
+.pied-bas-fond { background: var(--pied-bas); }
 .pied-bas {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
   max-width: 1080px; margin: 0 auto; padding: 1rem;
   display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; justify-content: space-between;
-  font-size: 0.82rem; color: #9fb2cf;
+  font-size: 0.82rem; color: var(--pied-texte); opacity: 0.85;
 }
 
 /* Le créateur, sur la page À propos */
-.auteur { display: flex; align-items: center; gap: 0.9rem; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--papier-2); }
+.auteur { display: flex; align-items: center; gap: 0.9rem; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--trait); }
 .auteur p { margin: 0; }
 .auteur-initiales {
   width: 54px; height: 54px; border-radius: 50%; flex: none;
   display: grid; place-items: center;
   font-family: var(--police-titre); font-weight: 600; letter-spacing: 0.04em;
-  background: var(--encre); color: var(--accent);
+  background: #06274a; color: var(--or);
 }
 
 /* --- Listes des inscrits et impression ------------------------------------- */
 
 .seulement-impression { display: none; }
-.ligne-nouvelle td { background: #fff7d6; }
+.ligne-nouvelle td { background: var(--or-fond); }
 .tableau-liste td { vertical-align: top; }
 
 /* Quand on imprime (Ctrl + P), on ne garde que la liste : pas de menu,
-   pas de boutons, et une colonne pour la signature des étudiants. */
+   pas de boutons, et une colonne pour la signature des étudiants.
+   L'impression est toujours en noir sur blanc, même en mode sombre. */
 @media print {
   @page { margin: 14mm; }
-  body { background: #fff; font-size: 11pt; }
+  :root, :root[data-theme="sombre"] {
+    --fond: #fff; --carte: #fff; --texte: #000; --texte-doux: #333; --trait: #999;
+  }
+  body { background: #fff; color: #000; font-size: 11pt; }
   .entete, .onglets, .pied, .sans-impression, #message-general, dialog { display: none !important; }
   .seulement-impression { display: block; }
   th.seulement-impression, td.seulement-impression { display: table-cell; }
   main { padding: 0; max-width: none; }
   .carte { box-shadow: none; border: none; padding: 0; }
   .titre-impression h1 { font-size: 18pt; margin: 0.3rem 0 0.8rem; }
-  .titre-impression .logo-mot { font-size: 14pt; }
-  table { border-radius: 0; }
+  .titre-impression .logo-mot { font-size: 14pt; color: #000; --logo-fond: #fff; }
+  table { border-radius: 0; background: #fff; }
   th { background: #fff !important; color: #000; border-bottom: 2px solid #000; }
-  td { border-bottom: 1px solid #999; }
+  td { border-bottom: 1px solid #999; color: #000; }
   tr { break-inside: avoid; }
   .colonne-signature { width: 28%; }
   .ligne-nouvelle td { background: none; }
@@ -509,7 +715,7 @@ dialog::backdrop { background: rgba(6, 39, 74, 0.6); }
 
 /* Note « méthode provisoire » (remise des codes) */
 .note-provisoire {
-  border-left: 5px solid var(--accent); background: #fff8e1; color: var(--encre);
+  border-left: 5px solid var(--or); background: var(--or-fond); color: var(--texte);
   padding: 0.7rem 1rem; border-radius: 10px; margin: 0 0 1rem;
 }
 
