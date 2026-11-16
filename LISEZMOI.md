@@ -192,6 +192,7 @@ vote-etudiant-prototype/
 │   │   ├── vote.js            Enregistrement d’un vote et ses 5 vérifications
 │   │   ├── codes.js           Fabrication et vérification des codes
 │   │   ├── distribution.js    Remise et remplacement des codes, statistiques
+│   │   ├── corrections.js     Corrections de la liste (nom, code, retrait, promotion)
 │   │   ├── scrutins.js        Séances, dévoilement, second tour, candidats
 │   │   ├── resultats.js       Calcul des élus et des égalités
 │   │   ├── direct.js          Le direct (décompte et participation en temps réel)
@@ -204,7 +205,7 @@ vote-etudiant-prototype/
 │       ├── public.js          Ouvertes à tous
 │       ├── etudiant.js        Espace étudiant
 │       ├── admin.js           Connexion des officiels, statistiques, journal
-│       ├── admin-codes.js     Distributeurs
+│       ├── admin-codes.js     Distributeurs (et corrections de la liste)
 │       ├── admin-scrutins.js  Superviseur
 │       └── admin-nettoyage.js Nettoyage (superviseur)
 ├── public/                    Les pages du site (HTML, CSS, JavaScript)
@@ -274,7 +275,16 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
 - La liste se filtre par nom et s’imprime (liste d’émargement avec une colonne *Signature*).
   **Les codes n’apparaissent jamais sur la liste** : une liste avec les codes donnerait le droit
   de vote de toute la promotion à celui qui la trouve.
-- Le superviseur et l’observateur consultent les listes (onglet *Listes des inscrits*), sans pouvoir les modifier.
+- **Corriger la liste** (bouton *Corriger…* sur chaque ligne) : le **distributeur** et le **superviseur** peuvent
+  - corriger le nom, le postnom, le prénom ou le matricule (faute de frappe) ;
+  - changer l’étudiant de promotion (son ancien code est supprimé, le distributeur lui en remet un nouveau) ;
+  - annuler son code (il ne marche plus tout de suite ; ses votes déjà faits restent comptés) ;
+  - le retirer de la liste s’il a été inscrit par erreur.
+
+  On ne peut ni retirer ni changer de promotion un étudiant **qui a déjà voté**. Chaque correction
+  demande un motif (sauf la faute de frappe) et est notée au journal. Le superviseur corrige,
+  mais il ne crée **jamais** de code : c’est le distributeur qui les remet.
+- L’observateur consulte les listes, sans pouvoir les modifier.
 - En démonstration, la plupart des étudiants fictifs ont déjà reçu leur code ; les deux derniers
   de chaque promotion pas encore. Les candidats fictifs ont un portrait dessiné (dossier
   `src/base/photos-demo`) ; un vrai candidat reçoit sa vraie photo depuis l’onglet *Votes*.

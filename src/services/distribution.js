@@ -74,8 +74,22 @@ export function nomPourComparer(texte) {
     .toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function nomComplet(e) {
+export function nomComplet(e) {
   return [e.nom, e.postnom, e.prenom].filter(Boolean).join(' ');
+}
+
+// Cherche dans une promotion un étudiant qui porte le même nom (même nom
+// complet, ou même nom + prénom). exclureId : l'étudiant lui-même, quand on
+// corrige son nom. Renvoie l'étudiant trouvé, ou undefined.
+export async function chercherHomonyme(tx, promotionId, { nom, postnom, prenom }, exclureId = 0) {
+  const existants = await tx`
+    select nom, postnom, prenom from etudiant
+    where promotion_id = ${promotionId} and id <> ${exclureId}`;
+  const cherche = nomPourComparer(`${nom} ${postnom} ${prenom}`);
+  const nomPrenom = nomPourComparer(`${nom} ${prenom}`);
+  return existants.find((e) =>
+    nomPourComparer(nomComplet(e)) === cherche ||
+    (prenom && nomPourComparer(`${e.nom} ${e.prenom}`) === nomPrenom));
 }
 
 // --- La liste d'une promotion ----------------------------------------------
@@ -140,13 +154,7 @@ export async function inscrireEtRemettreCode(sql, adminId, promotionId, identite
 
     // Un étudiant du même nom est-il déjà inscrit dans cette promotion ?
     if (!identite.confirmerHomonyme) {
-      const existants = await tx`
-        select nom, postnom, prenom from etudiant where promotion_id = ${promotionId}`;
-      const cherche = nomPourComparer(`${nom} ${postnom} ${prenom}`);
-      const nomPrenom = nomPourComparer(`${nom} ${prenom}`);
-      const double = existants.find((e) =>
-        nomPourComparer(nomComplet(e)) === cherche ||
-        (prenom && nomPourComparer(`${e.nom} ${e.prenom}`) === nomPrenom));
+      const double = await chercherHomonyme(tx, promotionId, { nom, postnom, prenom });
       if (double) {
         throw new ErreurMetier(
           `« ${nomComplet(double)} » est déjà inscrit dans cette promotion. S’il a perdu son code, utilisez « Remplacer » dans la liste. Si c’est bien une autre personne, confirmez.`,

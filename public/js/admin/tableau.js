@@ -2,6 +2,7 @@
 //   distributeur : Inscription et codes, Statistiques
 //   superviseur  : Votes, Listes des inscrits, Statistiques, Journal, Nettoyage
 //   observateur  : les mêmes, en lecture seule
+// Distributeur et superviseur peuvent corriger la liste des inscrits.
 // Le serveur vérifie de toute façon le rôle à chaque action.
 
 import { api, e, afficherMessage, lancerDecomptes } from '../commun.js';
