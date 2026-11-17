@@ -253,7 +253,7 @@ export async function afficherVotes(conteneur, moi) {
       const promotion = choix.selectedOptions[0].textContent;
       const ok = await confirmer({
         titre: 'Ouvrir plusieurs votes',
-        texte: `Tu vas ouvrir <strong>${postes.map((p) => NOMS_GROUPE[p]).join(', ')}</strong>
+        texte: `Vous allez ouvrir <strong>${postes.map((p) => NOMS_GROUPE[p]).join(', ')}</strong>
           pour <strong>${e(promotion)}</strong>, pendant <strong>${dureeMinutes} minutes</strong>.
           Les listes de candidats ne pourront plus changer.`,
         bouton: 'Ouvrir ces votes',

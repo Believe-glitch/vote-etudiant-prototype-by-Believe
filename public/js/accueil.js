@@ -78,7 +78,7 @@ function aideCode(valeur) {
   if (!sitePossible) return ['erreur', `Après la faculté vient le site : ${siglesSites.join(' ou ')}.`];
   if (!siglesSites.includes(site)) return ['', `Le site : ${siglesSites.join(' ou ')}.`];
   const interdit = [...secret].filter((c) => !ALPHABET.includes(c));
-  if (interdit.length) return ['erreur', `Un code ne contient jamais ${interdit.join(', ')} : vérifiez ces caractères (0, O, 1, I et L n’existent pas dans les codes).`];
+  if (interdit.length) return ['erreur', `Les codes n’ont jamais de 0, O, 1, I ou L (trop faciles à confondre). Vérifiez : ${interdit.join(', ')}.`];
   if (secret.length < SECRET) return ['', `Encore ${SECRET - secret.length} caractère${SECRET - secret.length > 1 ? 's' : ''}.`];
   return ['ok', '✓ Le code est complet.'];
 }

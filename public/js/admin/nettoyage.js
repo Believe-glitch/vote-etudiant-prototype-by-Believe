@@ -63,7 +63,7 @@ export async function afficherNettoyage(conteneur) {
   conteneur.innerHTML = `<div id="page-nettoyage">
     <section class="carte carte-simple">
       <h2>Nettoyage</h2>
-      <p class="texte-doux">Pour repartir propre après des essais. Chaque nettoyage demande votre mot de passe et le mot <strong>EFFACER</strong>.
+      <p class="texte-doux">Pour repartir de zéro après des essais. Chaque nettoyage demande votre mot de passe et le mot <strong>EFFACER</strong>.
         Le journal n’est jamais effacé : chaque nettoyage y est noté, avec votre nom et l’heure.</p>
       ${bloque ? `<div class="message message-erreur" role="alert">
         Un vote est ouvert en ce moment : le nettoyage est impossible jusqu’à sa fermeture (onglet <em>Candidats et séances</em>).

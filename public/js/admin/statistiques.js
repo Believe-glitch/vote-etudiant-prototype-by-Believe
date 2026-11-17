@@ -46,7 +46,7 @@ export async function afficherStatistiques(conteneur) {
   const [stats, structure] = await Promise.all([api('/api/admin/statistiques'), api('/api/structure')]);
 
   conteneur.innerHTML = `
-    <p class="texte-doux">Un remplacement = un code perdu, annulé puis remplacé. Après le vote, comparez « codes remis » et votants : tout écart anormal se voit.</p>
+    <p class="texte-doux">Un remplacement = un code perdu, annulé puis remplacé. Après le vote, comparez les codes remis et le nombre de votants : un écart anormal se voit tout de suite.</p>
     ${tableau('Université', ligne(stats.universite.nom, stats.universite, 'total'))}
     <form id="filtres-stats" class="carte carte-simple filtres section" role="search" aria-label="Filtrer les statistiques">
       <h2 class="petit-titre">Filtrer</h2>

@@ -42,30 +42,30 @@
     <section class="carte section">
       <p class="logo-mot sur-clair logo-grand" role="img" aria-label="URKIMeVote">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</p>
       <h2>Le projet</h2>
-      <p>URKIMeVote permet d’organiser les élections étudiantes de l’Université Révérend Kim, sur les sites de Lingwala et de N’djili : CP, CPA et secrétaire de chaque promotion, et présidence de l’université.</p>
-      <p>Il garantit trois choses : <strong>simple</strong> (on vote en une minute depuis son téléphone), <strong>juste</strong> (un étudiant, un code, une voix par poste) et <strong>transparent</strong> (participation en direct, résultats dévoilés à tous, choix secret).</p>
+      <p>URKIMeVote sert à organiser les élections étudiantes de l’Université Révérend Kim, à Lingwala et à N’djili : le CP, le CPA et le secrétaire de chaque promotion, et la présidence de l’université.</p>
+      <p>L’idée est simple : chaque étudiant vote depuis son téléphone, avec un seul code, et tout le monde découvre les résultats au même moment. Le choix de chacun reste secret.</p>
     </section>
 
     <section class="carte section">
       <h2>Pourquoi ce projet</h2>
-      <p>À l’Université Révérend Kim, les élections étudiantes se déroulent encore surtout sur papier. Avec le nombre d’étudiants que compte l’université, sur deux sites, ce système devient lent et lourd : files d’attente, dépouillement à la main, résultats longs à connaître, et des doutes qui s’installent facilement.</p>
-      <p>J’ai voulu <strong>fluidifier les votes</strong> : que chaque étudiant puisse voter en une minute depuis son téléphone, et que les résultats tombent pour tout le monde au même moment, sans contestation possible.</p>
-      <p>J’ai aussi voulu <strong>créer un engouement positif autour des élections</strong> : suivre la participation en direct, découvrir les candidats et leurs slogans, vivre le dévoilement des résultats ensemble. Le but est de donner envie à tous les étudiants de voter.</p>
+      <p>À l’Université Révérend Kim, les élections étudiantes se déroulent encore surtout sur papier. Avec autant d’étudiants, sur deux sites, ça devient vite long et lourd : les files d’attente, le dépouillement à la main, les résultats qui tardent, et parfois des doutes sur le comptage.</p>
+      <p>J’ai voulu <strong>rendre le vote plus rapide</strong> : chaque étudiant vote en une minute depuis son téléphone, et les résultats s’affichent pour tout le monde au même moment, ce qui laisse moins de place aux doutes.</p>
+      <p>Je voulais aussi que <strong>les élections intéressent plus d’étudiants</strong>. On peut découvrir les candidats et leurs slogans, suivre la participation en direct, et regarder ensemble les résultats s’afficher, projetés devant la salle. J’espère que ça donnera envie à plus de monde d’aller voter.</p>
       <div class="auteur">
         <span class="auteur-initiales" aria-hidden="true">BMK</span>
-        <p><strong>Believe Mukengeshayi Kadima</strong><br><span class="texte-doux">Étudiant en L2 Informatique, créateur de URKIMeVote</span></p>
+        <p><strong>Believe Mukengeshayi Kadima</strong><br><span class="texte-doux">Étudiant en L2 Informatique, créateur d’URKIMeVote</span></p>
       </div>
     </section>
 
     <section class="carte section">
       <h2>Prototype de démonstration</h2>
-      <p>Cette version est un prototype : les étudiants et les candidats sont fictifs, et leurs portraits sont de simples dessins. Dans la version finale, le superviseur chargera les vraies photos des candidats. Ce prototype sert à montrer le fonctionnement de l’application avant sa validation par l’université.</p>
+      <p>Cette version est un prototype : les étudiants et les candidats sont fictifs, et leurs portraits sont de simples dessins. Dans la version finale, le superviseur chargera les vraies photos des candidats. Ce prototype sert à montrer comment l’application fonctionne, avant que l’université décide de l’adopter.</p>
     </section>
 
     <section class="carte section">
       <h2>Comment l’application est construite</h2>
-      <p>URKIMeVote est une <strong>application web</strong> : on l’ouvre dans un navigateur comme un site, mais un serveur travaille derrière. Il vérifie les codes, enregistre les votes et calcule les résultats. Toutes les règles du vote sont vérifiées par ce serveur, et une partie d’entre elles directement par la base de données : même quelqu’un qui modifie la page dans son navigateur ne peut pas les contourner.</p>
-      <p class="texte-doux">Serveur Node.js (Fastify), base de données PostgreSQL, pages légères sans framework pour fonctionner sur tous les téléphones.</p>
+      <p>C’est une <strong>application web</strong> : on l’ouvre dans le navigateur comme n’importe quel site, mais derrière, un serveur fait le travail. Il vérifie les codes, enregistre les votes et calcule les résultats. Les règles du vote sont contrôlées par le serveur, et certaines directement par la base de données. Modifier la page dans son navigateur ne permet donc pas de les contourner.</p>
+      <p class="texte-doux">Côté technique : un serveur Node.js (avec Fastify), une base de données PostgreSQL hébergée chez Neon, le tout en ligne sur Render. Les pages sont légères et sans framework, pour s’ouvrir vite même sur un petit téléphone.</p>
     </section>
   </main>
 
@@ -73,7 +73,7 @@
     <div class="pied-contenu">
       <div class="pied-marque">
         <a class="logo" href="/" aria-label="URKIMeVote, retour à l’accueil"><span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span></a>
-        <p>Le vote électronique des élections étudiantes de l’Université Révérend Kim : simple, juste et transparent.</p>
+        <p>Le site de vote des élections étudiantes de l’Université Révérend Kim.</p>
       </div>
       <nav class="pied-colonne" aria-label="Pages du site">
         <p class="pied-titre">Le site</p>
