@@ -308,6 +308,12 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
   plein écran ; la page derrière est bloquée, l’animation se joue au centre (*Rejouer*, *Fermer*,
   ou la touche Échap). Le lien direct `/resultats?scrutin=12` reste utilisable pour projeter.
 
+- **Espace étudiant** : un étudiant connecté voit d’abord ce qui le concerne. *Mes votes* suit
+  chacun de ses postes (pas encore ouvert → ouvert → voté → résultats dévoilés, avec le nom de
+  l’élu) ; le menu affiche *Mes votes* en premier, avec le nombre de votes qui l’attendent ; les
+  pages Candidats et Résultats s’ouvrent sur sa promotion et la présidence, avec un bouton
+  *Voir toute l’université*. Un visiteur sans code ne voit aucun changement.
+
 ---
 
 ## 11. Le nettoyage (superviseur)

@@ -1,6 +1,9 @@
 // Page d'accueil : connexion avec le code, et votes en cours en direct.
 
-import { api, e, afficherMessage, ecouterDirect, blocSeance, appliquerLargeurs, lancerDecomptes, marquerPageCourante } from './commun.js';
+import {
+  api, e, afficherMessage, ecouterDirect, blocSeance, appliquerLargeurs, lancerDecomptes, marquerPageCourante,
+  sessionEtudiant,
+} from './commun.js';
 
 marquerPageCourante();
 lancerDecomptes();
@@ -9,14 +12,20 @@ const formulaire = document.querySelector('#formulaire-code');
 const champCode = document.querySelector('#code');
 const zoneMessage = document.querySelector('#message-code');
 
-// Si l'étudiant est déjà connecté, on lui propose d'aller directement à ses votes.
-api('/api/etudiant/session')
-  .then(({ connecte }) => {
-    if (!connecte) return;
-    document.querySelector('#deja-connecte').classList.remove('cache');
-    formulaire.classList.add('cache');
-  })
-  .catch(() => { /* en cas de souci, on laisse simplement le formulaire */ });
+// Si l'étudiant est déjà connecté, on lui propose d'aller directement à ses
+// votes, en lui disant combien l'attendent.
+let moiEtudiant = null;
+sessionEtudiant().then((session) => {
+  if (!session.connecte) return;
+  moiEtudiant = session;
+  const bloc = document.querySelector('#deja-connecte');
+  bloc.querySelector('p').textContent = session.votesAFaire > 0
+    ? `Vous êtes connecté (${session.promotion}). ${session.votesAFaire} vote${session.votesAFaire > 1 ? 's vous attendent' : ' vous attend'}.`
+    : `Vous êtes connecté (${session.promotion}).`;
+  bloc.classList.remove('cache');
+  formulaire.classList.add('cache');
+  if (dernierEtat) afficherVotes(dernierEtat);   // ses votes passent en premier
+});
 
 // --- Les tirets se placent tout seuls ---------------------------------------
 // L'étudiant tape « L2INFLINQVM355 », le champ affiche « L2INF-LIN-QVM355 ».
@@ -96,10 +105,21 @@ formulaire.addEventListener('submit', async (evenement) => {
 const APERCU = 3;
 const zoneVotes = document.querySelector('#votes-en-cours');
 const zoneTous = document.querySelector('#tous-les-votes');
+let dernierEtat = null;
 ecouterDirect((etat) => {
+  dernierEtat = etat;
+  afficherVotes(etat);
+});
+
+// Un vote « le concerne » : sa promotion ou la présidence, sur son site.
+const meConcerne = (s) => moiEtudiant !== null && s.campusId === moiEtudiant.campusId
+  && (s.promotionId === moiEtudiant.promotionId || s.promotionId === null);
+
+function afficherVotes(etat) {
   const ouvertes = etat.seances
     .filter((s) => s.statut === 'ouverte')
-    .sort((a, b) => new Date(a.fin) - new Date(b.fin));
+    // D'abord ceux qui le concernent (étudiant connecté), puis les plus urgents.
+    .sort((a, b) => Number(meConcerne(b)) - Number(meConcerne(a)) || new Date(a.fin) - new Date(b.fin));
   if (ouvertes.length === 0) {
     zoneVotes.innerHTML = '<p class="texte-doux">Aucun vote n’est ouvert en ce moment.</p>';
     zoneTous.innerHTML = '';
@@ -107,7 +127,8 @@ ecouterDirect((etat) => {
   }
   zoneVotes.innerHTML = ouvertes.slice(0, APERCU).map((s) => `
     <article class="carte">
-      <h3>${e(s.nomPoste)}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}</h3>
+      <div class="ligne-flex"><h3>${e(s.nomPoste)}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}</h3>
+        ${meConcerne(s) ? '<span class="pastille pastille-devoile">Pour vous</span>' : ''}</div>
       <p class="texte-doux petit">${e(s.promotion ?? 'Toute l’université')} · séance de ${e(s.campus)}</p>
       ${blocSeance(s)}
     </article>`).join('');
@@ -116,4 +137,4 @@ ecouterDirect((etat) => {
        <span class="petit texte-doux">avec un filtre par site, faculté, promotion et poste</span>`
     : '';
   appliquerLargeurs(zoneVotes);
-});
+}

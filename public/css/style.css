@@ -197,6 +197,16 @@ p { margin: 0 0 0.8em; }
 .navigation a[aria-current="page"] { background: #0b4fa3; color: #fff; }
 .navigation .lien-officiels { color: var(--or); }
 
+/* « Mes votes » (étudiant connecté) : encadré d'or dans le menu du téléphone. */
+.navigation .lien-mes-votes {
+  color: #fff; font-weight: 700; border: 1.5px solid var(--or);
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;
+}
+.compteur-votes {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 999px; background: var(--or); color: #0b1220; font-size: 0.78rem; font-weight: 800;
+}
+
 /* Bouton clair / sombre. Sur téléphone, il s'écrit « Mode sombre » avec un
    interrupteur ; sur ordinateur, ce n'est qu'une petite icône ronde. */
 .bouton-theme {
@@ -231,6 +241,8 @@ p { margin: 0 0 0.8em; }
   .navigation a { color: var(--barre-texte); padding: 0.2rem 0; border-radius: 0; border-bottom: 2px solid transparent; }
   .navigation a:hover { background: none; color: #fff; }
   .navigation a[aria-current="page"] { background: none; color: #fff; border-bottom-color: var(--or); }
+  .navigation .lien-mes-votes { border: 0; border-bottom: 2px solid transparent; margin: 0; display: inline-flex; gap: 0.35rem; }
+  .navigation .lien-mes-votes[aria-current="page"] { border-bottom-color: var(--or); }
   .navigation .lien-officiels {
     color: var(--or); border: 1.5px solid var(--or); border-radius: 8px; padding: 0.3rem 0.8rem;
   }
@@ -499,6 +511,26 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .choix .candidat-nom, .choix .candidat-slogan { display: block; }
 .choix:has(input:checked) { border-color: var(--bleu); background: var(--bleu-fond); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
 .choix:has(input:focus-visible) { outline: 3px solid var(--bleu); outline-offset: 2px; }
+
+/* « Affiché pour vous » (étudiant connecté) */
+.pour-vous {
+  background: var(--bleu-fond); border: 1px solid var(--trait-fort); border-radius: 12px;
+  padding: 0.8rem 1rem; margin-bottom: 1rem;
+}
+.pour-vous p { margin: 0; }
+.pour-vous-titre { font-weight: 700; margin: 0.1rem 0 0.6rem !important; }
+
+/* Candidats repliés (« Mes votes », vote pas encore ouvert). */
+.candidats-replies summary {
+  display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-weight: 700;
+  color: var(--bleu-texte); list-style: none; padding: 0.3rem 0;
+}
+.candidats-replies summary::-webkit-details-marker { display: none; }
+.candidats-replies summary::after { content: "▾"; margin-left: auto; }
+.candidats-replies[open] summary::after { content: "▴"; }
+.mini-photos { display: inline-flex; }
+.photo.mini { width: 30px; height: 30px; font-size: 0.7rem; border: 2px solid var(--carte); margin-left: -8px; }
+.photo.mini:first-child { margin-left: 0; }
 
 /* --- Votes en cours et décompte ----------------------------------------- */
 

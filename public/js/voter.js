@@ -23,6 +23,7 @@ let moi = null;                 // ce que renvoie /api/etudiant/moi
 let signatureDirect = '';       // pour savoir si l'état des séances a changé
 const selections = new Map();   // candidat choisi (pas encore validé), par scrutin
 let voteEnAttente = null;       // { scrutinId, candidatId } pendant la confirmation
+let resultats = new Map();      // résultats des postes dévoilés (pour nommer les élus)
 
 // Pour chaque poste, on ne garde que le dernier tour (un second tour remplace le premier).
 function derniersTours(scrutins) {
@@ -46,6 +47,14 @@ async function charger() {
     return;
   }
   caleHorloge(moi.maintenant);
+  // Pour les postes dévoilés, on va chercher le nom des élus (résultats publics).
+  resultats = new Map();
+  await Promise.all(derniersTours(moi.scrutins)
+    .filter((s) => s.statut === 'devoile' && !s.eluDOffice)
+    .map(async (s) => {
+      const r = await api(`/api/resultats/${s.id}`).catch(() => null);
+      if (r) resultats.set(s.id, r);
+    }));
   // On n'affiche que le début du code : la partie secrète ne revient jamais du serveur.
   zoneIdentite.textContent = `Code ${moi.prefixe}-•••••• · ${moi.promotion}`;
   afficher();
@@ -63,24 +72,30 @@ function afficher() {
   }
 }
 
+// Une carte par poste, qui suit l'élection du début à la fin :
+// pas encore ouvert → ouvert (il vote ici) → voté → résultats dévoilés.
 function blocScrutin(s) {
   const titre = `${e(s.nomPoste)}${s.tour > 1 ? ` <span class="pastille">${s.tour}e tour</span>` : ''}`;
   const sousTitre = s.poste === 'PRESIDENCE' ? 'Toute l’université' : e(moi.promotion);
-  let contenu;
-
   const seance = s.seance;
   const voteOuvert = seance && seance.statut === 'ouverte' && secondesRestantes(seance.fin) > 0;
+  let etat = '';       // la pastille à droite du titre
+  let contenu;
 
   if (s.candidats.length === 0) {
-    contenu = '<p class="texte-doux">Aucun candidat : le poste est vacant.</p>';
+    etat = '<span class="pastille">Poste vacant</span>';
+    contenu = '<p class="texte-doux">Aucun candidat pour ce poste.</p>';
   } else if (s.eluDOffice) {
-    contenu = `<div class="message message-ok">${e(s.candidats[0].nom)} est élu(e) d’office (candidat unique).</div>`;
+    etat = '<span class="pastille pastille-devoile">Élu(e) d’office</span>';
+    contenu = `<p>${e(s.candidats[0].nom)} est élu(e) d’office (candidat unique).</p>`;
   } else if (s.statut === 'devoile') {
-    contenu = `<p>Les résultats sont dévoilés.</p>
-      <a class="bouton" href="/resultats?scrutin=${s.id}">Voir les résultats</a>`;
+    etat = '<span class="pastille pastille-devoile">Résultats dévoilés</span>';
+    contenu = `${nomsDesElus(s)}
+      <a class="bouton bouton-contour" href="/resultats?scrutin=${s.id}">Voir le résultat</a>`;
   } else if (s.aVote) {
-    contenu = `<div class="message message-ok">Vous avez voté pour ce poste. Merci !</div>
-      ${seance && seance.statut === 'ouverte' ? `<div data-seance="${s.id}">${blocSeance(seance)}</div>` : ''}`;
+    // On ne rappelle jamais pour qui il a voté.
+    etat = '<span class="pastille pastille-vote">✓ Vous avez voté</span>';
+    contenu = '<p class="texte-doux">Merci ! Les résultats seront visibles ici quand le superviseur les dévoilera.</p>';
   } else if (voteOuvert) {
     contenu = `
       <div data-seance="${s.id}">${blocSeance(seance)}</div>
@@ -101,24 +116,44 @@ function blocScrutin(s) {
         <button class="bouton bouton-accent section" type="submit">Valider mon vote</button>
       </form>`;
   } else if (seance && seance.statut === 'fermee') {
-    contenu = '<p class="texte-doux">Le vote est fermé. Les résultats seront dévoilés par le superviseur.</p>';
+    etat = '<span class="pastille pastille-ferme">Vote fermé</span>';
+    contenu = '<p class="texte-doux">Vous n’avez pas voté pour ce poste. Les résultats seront dévoilés par le superviseur.</p>';
   } else {
-    contenu = `<p class="texte-doux">Le vote n’est pas encore ouvert. Voici les candidats :</p>
-      <div class="liste-candidats">
-        ${s.candidats.map((c) => `
-          <div class="candidat">${photoCandidat(c)}
-            <div><div class="candidat-nom">${e(c.nom)}</div>
-            ${c.slogan ? `<p class="candidat-slogan">${e(c.slogan)}</p>` : ''}</div>
-          </div>`).join('')}
-      </div>`;
+    // Pas encore ouvert : les candidats sont repliés, pour garder la page courte.
+    etat = '<span class="pastille">Pas encore ouvert</span>';
+    contenu = `
+      <details class="candidats-replies">
+        <summary>
+          <span class="mini-photos">${s.candidats.slice(0, 4).map((c) => photoCandidat(c, 'mini')).join('')}</span>
+          Voir les ${s.candidats.length} candidat${s.candidats.length > 1 ? 's' : ''}
+        </summary>
+        <div class="liste-candidats section">
+          ${s.candidats.map((c) => `
+            <div class="candidat">${photoCandidat(c)}
+              <div><div class="candidat-nom">${e(c.nom)}</div>
+              ${c.slogan ? `<p class="candidat-slogan">${e(c.slogan)}</p>` : ''}</div>
+            </div>`).join('')}
+        </div>
+      </details>`;
   }
 
   return `
     <article class="carte section" id="scrutin-${s.id}">
-      <h2>${titre}</h2>
+      <div class="ligne-flex"><h2>${titre}</h2>${etat}</div>
       <p class="texte-doux petit">${sousTitre}</p>
       ${contenu}
     </article>`;
+}
+
+// « Président : … · Vice-président : … », « Élu(e) : … », ou l'égalité.
+function nomsDesElus(s) {
+  const r = resultats.get(s.id);
+  if (!r) return '';
+  const nomDe = (id) => r.candidats.find((c) => c.id === id)?.nom ?? '';
+  if (r.egalite && r.places.length === 0) {
+    return '<p>Égalité : un second tour départagera les candidats.</p>';
+  }
+  return `<p>${r.places.map((p) => `${e(p.nomPlace)} : <strong>${e(nomDe(p.candidatId))}</strong>`).join(' · ')}</p>`;
 }
 
 // --- Choix et confirmation du vote -------------------------------------------

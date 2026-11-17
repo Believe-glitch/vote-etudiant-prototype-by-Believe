@@ -7,7 +7,7 @@
 
 import {
   api, e, photoCandidat, afficherMessage, ecouterDirect, blocSeance, appliquerLargeurs,
-  pourcentage, lancerDecomptes, marquerPageCourante,
+  pourcentage, lancerDecomptes, marquerPageCourante, sessionEtudiant,
 } from './commun.js';
 import { brancherFiltrePromotion, pourComparer } from './filtres.js';
 
@@ -92,6 +92,25 @@ async function demarrerListe() {
     devoiles = await api('/api/resultats').catch(() => []);
     afficher();
   }
+
+  // Étudiant connecté : on part de sa promotion (la présidence reste toujours
+  // visible). Le bouton « Voir toute l'université » remet tous les filtres.
+  const session = await sessionEtudiant();
+  if (session.connecte) {
+    filtre.choisir(session.promotionId);
+    const blocPourVous = document.querySelector('#pour-vous');
+    document.querySelector('#pour-vous-texte').textContent = `${session.promotion} + Présidence de l’université`;
+    blocPourVous.classList.remove('cache');
+    const toutVoir = () => blocPourVous.classList.add('cache');
+    document.querySelector('#voir-tout').addEventListener('click', () => {
+      filtre.reinitialiser();
+      toutVoir();
+      afficher();
+    });
+    // Dès qu'il change lui-même un filtre, le rappel « pour vous » disparaît.
+    document.querySelector('#filtres').addEventListener('change', toutVoir);
+  }
+  afficher();   // la liste suit tout de suite le filtre choisi
 
   // Un clic sur un résultat ouvre la fenêtre plein écran (Ctrl+clic ou clic
   // du milieu ouvrent toujours la page dans un nouvel onglet).
