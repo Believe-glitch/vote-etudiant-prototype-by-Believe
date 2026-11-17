@@ -37,7 +37,7 @@ export async function routesEtudiant(app) {
     if (!trouve) {
       app.limiteurEtudiants.noterEchec(cleLimiteur);
       await patienter(400);
-      throw new ErreurMetier('Code inconnu ou plus valide. Vérifiez chaque caractère.', 401);
+      throw new ErreurMetier('Ce code n’existe pas ou n’est plus valide. Vérifiez chaque caractère.', 401);
     }
 
     const { jeton, dureeSecondes } = await ouvrirSession(sql, 'etudiant', trouve.id);

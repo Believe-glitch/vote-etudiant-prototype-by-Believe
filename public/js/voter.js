@@ -181,7 +181,7 @@ zoneListe.addEventListener('submit', (evenement) => {
   const candidat = scrutin.candidats.find((c) => c.id === Number(coche.value));
   voteEnAttente = { scrutinId, candidatId: candidat.id };
   document.querySelector('#texte-confirmation').innerHTML =
-    `Vous votez pour <strong>${e(candidat.nom)}</strong> — ${e(scrutin.nomPoste)}.`;
+    `Vous votez pour <strong>${e(candidat.nom)}</strong>, au poste de ${e(scrutin.nomPoste)}.`;
   dialogue.showModal();
 });
 

@@ -166,7 +166,7 @@ export async function inscrireEtRemettreCode(sql, adminId, promotionId, identite
       const double = await chercherHomonyme(tx, promotionId, { nom, postnom, prenom });
       if (double) {
         throw new ErreurMetier(
-          `« ${nomComplet(double)} » est déjà inscrit dans cette promotion. S’il a perdu son code, utilisez « Remplacer » dans la liste. Si c’est bien une autre personne, confirmez.`,
+          `« ${nomComplet(double)} » est déjà inscrit dans cette promotion. S’il a perdu son code, utilisez « Remplacer (perdu) » dans la liste. Si c’est bien une autre personne, confirmez.`,
           409, { homonyme: true });
       }
     }
@@ -195,7 +195,7 @@ export async function genererCode(sql, adminId, etudiantId, cleSecrete) {
   return sql.begin(async (tx) => {
     const etudiant = await lireEtudiantPourCode(tx, etudiantId);
     const code = await insererNouveauCode(tx, etudiant, adminId, cleSecrete);
-    if (!code) throw new ErreurMetier('Cet étudiant a déjà un code. En cas de perte, utilisez « Remplacer ».', 409);
+    if (!code) throw new ErreurMetier('Cet étudiant a déjà un code. S’il l’a perdu, utilisez « Remplacer (perdu) ».', 409);
     await noterAuJournal(tx, adminId, 'code_remis', {
       etudiantId, nom: etudiant.nom_complet, matricule: etudiant.matricule, campusId: etudiant.campus_id,
     });
@@ -213,7 +213,7 @@ export async function remplacerCode(sql, adminId, etudiantId, motif, cleSecrete)
     const etudiant = await lireEtudiantPourCode(tx, etudiantId);
     const [ancien] = await tx`
       select id from code_vote where etudiant_id = ${etudiantId} and statut = 'actif' for update`;
-    if (!ancien) throw new ErreurMetier('Cet étudiant n’a pas encore de code : utilisez « Générer ».', 409);
+    if (!ancien) throw new ErreurMetier('Cet étudiant n’a pas encore de code : utilisez « Remettre le code ».', 409);
 
     await tx`
       update code_vote set statut = 'annule', motif_annulation = ${motifPropre}, annule_le = now()
