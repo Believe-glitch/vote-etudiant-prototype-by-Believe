@@ -432,6 +432,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 .bouton-petit { padding: 0.35rem 0.7rem; min-height: 36px; font-size: 0.9rem; }
 .bouton-large { width: 100%; }
 .rangee-boutons { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.rangee-boutons:empty { display: none; }
 .bouton + p { margin-top: 0.9rem; }   /* petit texte d'aide placé sous un bouton */
 
 /* Sur les bandeaux et la barre du haut (fonds bleus), les boutons sont
@@ -464,6 +465,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
 @keyframes respirer { 50% { opacity: 0.35; } }
 .pastille-ferme { background: var(--fond-2); color: var(--texte); }
 .pastille-devoile { background: var(--bleu); color: #fff; }
+.pastille-vote { background: var(--ok-fond); color: var(--ok-texte); white-space: nowrap; }
 
 /* --- Candidats -------------------------------------------------------- */
 
@@ -552,6 +554,24 @@ input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible
   .pastille-ouvert::before { animation: none; }
 }
 
+/* --- Résultat en plein écran ------------------------------------------- */
+
+.sans-defilement, .sans-defilement body { overflow: hidden; }
+dialog.plein-ecran {
+  width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0;
+  padding: 0; border: 0; border-radius: 0; background: var(--fond); overflow-y: auto;
+}
+dialog.plein-ecran::backdrop { background: var(--voile); }
+.plein-ecran-contenu { max-width: 900px; margin: 0 auto; padding: 1.2rem 1rem 3rem; }
+.plein-ecran-entete {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+  position: sticky; top: 0; z-index: 1; background: var(--fond);
+  padding: 0.6rem 0 0.4rem; border-bottom: 3px solid var(--or); margin-bottom: 1rem;
+}
+.plein-ecran-entete h1 { font-size: 1.6rem; margin: 0; }
+.plein-ecran-entete p { margin: 0.2rem 0 0; }
+@media (min-width: 720px) { .plein-ecran-entete h1 { font-size: 2.2rem; } }
+
 /* --- Tableaux ----------------------------------------------------------- */
 
 .tableau-conteneur { overflow-x: auto; }
@@ -595,6 +615,9 @@ dialog::backdrop { background: var(--voile); }
 }
 .ligne-flex { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: space-between; }
 .champ-duree { width: 90px !important; }
+label.case { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0 0.4rem 0 0; }
+label.case input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--bleu); }
+.groupe-promotion { margin-bottom: 1.2rem; }
 
 /* Page de connexion des officiels : une carte sombre, pour marquer que
    c'est un espace à part. */

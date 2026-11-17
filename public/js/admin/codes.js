@@ -12,6 +12,10 @@
 import { api, e, afficherMessage, formaterDateHeure } from '../commun.js';
 import { confirmer, demanderTexte, montrer, choisir, demanderFormulaire } from './dialogue.js';
 
+// Noms courts des postes, pour la colonne « A voté ».
+const ORDRE_POSTES = ['CP', 'CPA', 'SECRETAIRE', 'PRESIDENCE'];
+const NOMS_COURTS = { CP: 'CP', CPA: 'CPA', SECRETAIRE: 'Secrétaire', PRESIDENCE: 'Présidence' };
+
 const MEMOIRE = 'promotion-listes';
 
 // Même règle que le serveur : minuscules, sans accents.
@@ -112,6 +116,16 @@ export async function afficherListes(conteneur, moi) {
 
   // --- La liste ----------------------------------------------------------------
 
+  // Les postes pour lesquels l'étudiant a déjà voté (jamais pour qui).
+  function pastillesVotes(postes) {
+    if (!postes || postes.length === 0) return '<span class="texte-doux petit">Pas encore</span>';
+    return ORDRE_POSTES.filter((p) => postes.includes(p))
+      .map((p) => `<span class="pastille pastille-vote">✓ ${e(NOMS_COURTS[p])}</span>`).join(' ');
+  }
+  const dejaVote = (etudiant) => (etudiant.postesVotes?.length
+    ? ORDRE_POSTES.filter((p) => etudiant.postesVotes.includes(p)).map((p) => NOMS_COURTS[p]).join(', ')
+    : '');
+
   async function charger() {
     const promotionId = Number(selectPromo.value);
     if (!promotionId) {
@@ -128,7 +142,7 @@ export async function afficherListes(conteneur, moi) {
     }
     conteneur.querySelector('#titre-liste').textContent = liste.promotion.libelle;
     conteneur.querySelector('#resume-liste').textContent =
-      `${liste.inscrits} étudiant${liste.inscrits > 1 ? 's' : ''} inscrit${liste.inscrits > 1 ? 's' : ''} · ${liste.codesRemis} code${liste.codesRemis > 1 ? 's' : ''} remis`;
+      `${liste.inscrits} étudiant${liste.inscrits > 1 ? 's' : ''} inscrit${liste.inscrits > 1 ? 's' : ''} · ${liste.codesRemis} code${liste.codesRemis > 1 ? 's' : ''} remis · ${liste.votants} ${liste.votants > 1 ? 'ont' : 'a'} déjà voté`;
     afficherTableau();
   }
 
@@ -146,7 +160,7 @@ export async function afficherListes(conteneur, moi) {
     zoneTableau.innerHTML = `
       <div class="tableau-conteneur"><table class="tableau-liste">
         <thead><tr>
-          <th class="nombre">N°</th><th>Nom, postnom, prénom</th><th>Matricule</th><th>Code</th>
+          <th class="nombre">N°</th><th>Nom, postnom, prénom</th><th>Matricule</th><th>Code</th><th class="sans-impression">A voté</th>
           ${peutCorriger ? '<th class="sans-impression">Actions</th>' : ''}
           <th class="seulement-impression colonne-signature">Signature</th>
         </tr></thead>
@@ -158,6 +172,7 @@ export async function afficherListes(conteneur, moi) {
             <td>${et.codeRemisLe
               ? `Remis le ${e(formaterDateHeure(et.codeRemisLe))}${et.remplacements ? ` <span class="pastille">${et.remplacements} remplacement${et.remplacements > 1 ? 's' : ''}</span>` : ''}`
               : '<span class="texte-doux">Pas encore remis</span>'}</td>
+            <td class="sans-impression">${pastillesVotes(et.postesVotes)}</td>
             ${peutCorriger ? `<td class="sans-impression"><div class="rangee-boutons">${!estDistributeur ? '' : et.codeRemisLe
               ? `<button class="bouton bouton-contour bouton-petit" data-action="remplacer" data-id="${et.id}" type="button">Remplacer (perdu)</button>`
               : `<button class="bouton bouton-accent bouton-petit" data-action="generer" data-id="${et.id}" type="button">Remettre le code</button>`}
@@ -272,7 +287,10 @@ export async function afficherListes(conteneur, moi) {
       } else {
         const motif = await demanderTexte({
           titre: 'Remplacer un code perdu',
-          texte: `L’ancien code de ${identite} sera annulé. Les votes déjà faits avec lui restent comptés.`,
+          texte: `L’ancien code de ${identite} sera annulé et ne marchera plus.`
+            + (dejaVote(etudiant)
+              ? `<br><strong>Il a déjà voté pour : ${e(dejaVote(etudiant))}.</strong> Le nouveau code ne pourra pas revoter pour ces postes.`
+              : ' Il n’a encore voté pour aucun poste.'),
           etiquette: 'Motif (ex. « code perdu »)',
           bouton: 'Annuler l’ancien et créer le nouveau',
         });

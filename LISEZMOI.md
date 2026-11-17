@@ -102,7 +102,7 @@ Cas particuliers déjà prêts dans la démonstration :
 - **Présidence** : une séance par site ; choisis avant le vote le mode de dévoilement.
 
 Pour **repartir propre avant la présentation** : **superviseur** → onglet *Nettoyage* →
-*Tout remettre comme au départ* (retape ton mot de passe et écris `EFFACER`). Voir la section 10.
+*Tout remettre comme au départ* (retape ton mot de passe et écris `EFFACER`). Voir la section 11.
 
 ---
 
@@ -284,14 +284,33 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
   On ne peut ni retirer ni changer de promotion un étudiant **qui a déjà voté**. Chaque correction
   demande un motif (sauf la faute de frappe) et est notée au journal. Le superviseur corrige,
   mais il ne crée **jamais** de code : c’est le distributeur qui les remet.
+- La colonne **A voté** montre pour quels postes l’étudiant a déjà voté (✓ CP, ✓ CPA…), jamais
+  **pour qui**. Au remplacement d’un code perdu, le site rappelle les postes déjà votés : le
+  nouveau code ne pourra pas revoter pour eux.
 - L’observateur consulte les listes, sans pouvoir les modifier.
+- Côté étudiant, les **tirets du code se placent tout seuls** : il tape `L2INFLINQVM355`, le champ
+  affiche `L2INF-LIN-QVM355` (les sites LIN et NDJI sont reconnus).
 - En démonstration, la plupart des étudiants fictifs ont déjà reçu leur code ; les deux derniers
   de chaque promotion pas encore. Les candidats fictifs ont un portrait dessiné (dossier
   `src/base/photos-demo`) ; un vrai candidat reçoit sa vraie photo depuis l’onglet *Votes*.
 
 ---
 
-## 10. Le nettoyage (superviseur)
+## 10. Ouvrir plusieurs votes d’un coup et voir les résultats en grand
+
+- **Ouverture groupée** : dans l’onglet *Votes*, quand une promotion est choisie, la carte
+  *Toute la promotion en une fois* ouvre les postes cochés (CP, CPA, secrétaire) avec la même
+  durée. Un vote qui ne peut pas s’ouvrir (un seul candidat, déjà ouvert…) est signalé et laissé
+  de côté. Un bouton ferme d’un coup tous les votes ouverts de la promotion.
+- **Accueil** : il montre au plus 3 votes en cours (ceux qui se ferment le plus tôt) et un lien
+  *Voir tous les votes en cours* vers la page Résultats, qui a les filtres.
+- **Résultat en plein écran** : sur la page Résultats, un clic sur un résultat ouvre une fenêtre
+  plein écran ; la page derrière est bloquée, l’animation se joue au centre (*Rejouer*, *Fermer*,
+  ou la touche Échap). Le lien direct `/resultats?scrutin=12` reste utilisable pour projeter.
+
+---
+
+## 11. Le nettoyage (superviseur)
 
 Onglet *Nettoyage*, réservé au superviseur, pour remettre le site en ordre après des essais :
 
@@ -313,7 +332,7 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
 
 ---
 
-## 11. L’identité visuelle (nom, logo, couleurs)
+## 12. L’identité visuelle (nom, logo, couleurs)
 
 - **Le nom** s’écrit `URKIMeVote` : le « e » toujours en minuscule.
 - **Le logo** est écrit directement dans l’en-tête de chaque page (`<span class="logo-mot">`) :
@@ -340,7 +359,7 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
 
 ---
 
-## 12. Sécurité : ce qui est déjà en place
+## 13. Sécurité : ce qui est déjà en place
 
 - Le code complet n’est **jamais** rangé dans la base : seulement son empreinte (HMAC-SHA-256).
 - Les règles du vote sont vérifiées par le **serveur**, et les plus importantes par la **base** elle-même.
@@ -362,7 +381,7 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
 
 ---
 
-## 13. En cas de problème
+## 14. En cas de problème
 
 | Message | Solution |
 |---|---|

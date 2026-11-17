@@ -71,7 +71,7 @@ async function demarrerListe() {
     zoneAttente.innerHTML = attente.length === 0
       ? '<p class="texte-doux">Aucun vote en cours ni en attente pour ce choix.</p>'
       : attente.map((s) => `
-          <a class="carte" href="/resultats?scrutin=${s.scrutinId}">
+          <a class="carte" href="/resultats?scrutin=${s.scrutinId}" data-scrutin="${s.scrutinId}">
             <h3>${e(s.nomPoste)}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}</h3>
             <p class="texte-doux petit">${e(s.promotion ?? 'Toute l’université')} · séance de ${e(s.campus)}</p>
             ${blocSeance(s)}
@@ -80,7 +80,7 @@ async function demarrerListe() {
     zoneDevoiles.innerHTML = resultats.length === 0
       ? `<p class="texte-doux">${devoiles.length === 0 ? 'Aucun résultat dévoilé pour le moment.' : 'Aucun résultat ne correspond à ces filtres.'}</p>`
       : resultats.map((r) => `
-          <a class="carte" href="/resultats?scrutin=${r.id}">
+          <a class="carte" href="/resultats?scrutin=${r.id}" data-scrutin="${r.id}">
             <h3>${e(r.nomPoste)}${r.tour > 1 ? ` · ${r.tour}e tour` : ''}</h3>
             <p class="texte-doux petit">${e(r.promotion ?? 'Toute l’université')}</p>
             <span class="pastille pastille-devoile">${r.eluDOffice ? 'Élu(e) d’office' : r.complet ? 'Résultats complets' : 'Résultats partiels'}</span>
@@ -91,6 +91,17 @@ async function demarrerListe() {
   async function chargerListe() {
     devoiles = await api('/api/resultats').catch(() => []);
     afficher();
+  }
+
+  // Un clic sur un résultat ouvre la fenêtre plein écran (Ctrl+clic ou clic
+  // du milieu ouvrent toujours la page dans un nouvel onglet).
+  for (const zone of [zoneAttente, zoneDevoiles]) {
+    zone.addEventListener('click', (evenement) => {
+      const lien = evenement.target.closest('a[data-scrutin]');
+      if (!lien || evenement.ctrlKey || evenement.metaKey || evenement.shiftKey || evenement.button !== 0) return;
+      evenement.preventDefault();
+      ouvrirPleinEcran(Number(lien.dataset.scrutin));
+    });
   }
 
   ecouterDirect((etat) => {
@@ -107,25 +118,47 @@ async function demarrerListe() {
 // ---------------------------------------------------------------------
 // Vue détail
 // ---------------------------------------------------------------------
+// Le même affichage sert à deux endroits :
+//   - la page /resultats?scrutin=12 (lien direct, ou page projetée dans la salle) ;
+//   - la fenêtre plein écran qui s'ouvre quand on clique sur un résultat de la
+//     liste : la page derrière est bloquée, personne ne peut la faire défiler
+//     pendant l'animation, et on la voit en entier, au centre.
 
 function demarrerDetail() {
   document.querySelector('#vue-detail').classList.remove('cache');
-  const zoneContenu = document.querySelector('#contenu-resultat');
-  const zoneMessage = document.querySelector('#message');
+  afficherDetail(scrutinId, document.querySelector('#vue-detail'), { titreDuDocument: true });
+}
+
+// Affiche (et anime) le résultat d'un scrutin dans « racine ».
+// Renvoie une fonction qui arrête le direct (à appeler en fermant la fenêtre).
+function afficherDetail(id, racine, { titreDuDocument = false } = {}) {
+  const $ = (selecteur) => racine.querySelector(selecteur);
+  const zoneContenu = $('.contenu-resultat');
+  const zoneMessage = $('.message-resultat');
   let dejaAffiche = null;   // ce qu'on a déjà animé, pour ne pas rejouer sans raison
+  let versionVue = null;
+  let arrete = false;
+
+  function remplirTitre(s) {
+    $('.titre-scrutin').textContent = `${s.nomPoste}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}`;
+    $('.sous-titre-scrutin').textContent = s.promotion ?? 'Toute l’université · Lingwala et N’djili';
+    if (titreDuDocument) document.title = `${s.nomPoste} – Résultats`;
+  }
 
   async function charger() {
     try {
-      const resultat = await api(`/api/resultats/${scrutinId}`);
+      const resultat = await api(`/api/resultats/${id}`);
+      if (arrete) return;
       const empreinte = JSON.stringify([resultat.complet, resultat.parSite.map((s) => s.campusId)]);
       if (empreinte === dejaAffiche) return;
       dejaAffiche = empreinte;
       afficherMessage(zoneMessage, '');
       await afficherResultat(resultat);
     } catch (erreur) {
+      if (arrete) return;
       if (erreur.statut === 403) {
         // Pas encore dévoilé : on attend, en montrant la participation en direct.
-        const scrutin = await api(`/api/scrutins/${scrutinId}`).catch(() => null);
+        const scrutin = await api(`/api/scrutins/${id}`).catch(() => null);
         afficherAttente(scrutin);
       } else {
         afficherMessage(zoneMessage, erreur.message);
@@ -139,24 +172,25 @@ function demarrerDetail() {
     zoneContenu.innerHTML = `
       <div class="bandeau section">
         <h2>Résultats pas encore dévoilés</h2>
-        <p>Cette page s’animera toute seule dès que le superviseur dévoilera les résultats.</p>
-        <div id="participation-direct">
+        <p>Cet écran s’animera tout seul dès que le superviseur dévoilera les résultats.</p>
+        <div class="participation-direct">
           ${seances.map((s) => `<div class="section"><h3>Séance de ${e(s.campus)}</h3>${blocSeance(s)}</div>`).join('')}
         </div>
       </div>`;
     appliquerLargeurs(zoneContenu);
   }
 
-  ecouterDirect((etat) => {
-    const zoneDirect = document.querySelector('#participation-direct');
+  const direct = ecouterDirect((etat) => {
+    if (arrete) return;
+    const zoneDirect = $('.participation-direct');
     if (zoneDirect) {
-      const miennes = etat.seances.filter((s) => s.scrutinId === scrutinId);
+      const miennes = etat.seances.filter((s) => s.scrutinId === id);
       zoneDirect.innerHTML = miennes.map((s) => `<div class="section"><h3>Séance de ${e(s.campus)}</h3>${blocSeance(s)}</div>`).join('');
       if (miennes[0]) remplirTitre({ nomPoste: miennes[0].nomPoste, tour: miennes[0].tour, promotion: miennes[0].promotion });
       appliquerLargeurs(zoneDirect);
     }
-    if (etat.versionResultats !== versionConnue) {
-      versionConnue = etat.versionResultats;
+    if (etat.versionResultats !== versionVue) {
+      versionVue = etat.versionResultats;
       charger();
     }
   });
@@ -192,37 +226,58 @@ function demarrerDetail() {
     zoneContenu.innerHTML = `
       <section class="bandeau section">
         <p>Participation</p>
-        <p class="resultat-chiffre"><span id="compteur-votants">0</span> <span class="petit">votants sur ${inscrits} inscrits</span></p>
-        <p id="taux" class="cache">${pourcentage(votants, inscrits)} % de participation</p>
+        <p class="resultat-chiffre"><span class="compteur-votants">0</span> <span class="petit">votants sur ${inscrits} inscrits</span></p>
+        <p class="taux cache">${pourcentage(votants, inscrits)} % de participation</p>
       </section>
       <section class="carte section">
         <h2>Voix par candidat</h2>
         <div class="barres">${lignesBarres(r.candidats, r.places)}</div>
-        <div id="conclusion"></div>
+        <div class="conclusion"></div>
       </section>
       ${r.parSite.length > 1 ? tableauParSite(r) : ''}
-      <p class="rangee-boutons section"><button id="rejouer" class="bouton bouton-contour" type="button">Rejouer l’animation</button></p>`;
+      <p class="rangee-boutons section"><button class="bouton bouton-contour bouton-rejouer" type="button">Rejouer l’animation</button></p>`;
 
-    document.querySelector('#rejouer').addEventListener('click', () => {
+    $('.bouton-rejouer').addEventListener('click', () => {
       dejaAffiche = null;
       afficherResultat(r);
     });
 
-    await compter(document.querySelector('#compteur-votants'), votants, 1200);
-    document.querySelector('#taux').classList.remove('cache');
+    await compter($('.compteur-votants'), votants, 1200);
+    $('.taux').classList.remove('cache');
     await pause(500);
     await animerBarres(zoneContenu);
-    document.querySelector('#conclusion').innerHTML = conclusion(r);
+    $('.conclusion').innerHTML = conclusion(r);
+    $('.conclusion').scrollIntoView({ block: 'nearest', behavior: sansAnimation ? 'auto' : 'smooth' });
   }
 
   charger();
+  return () => { arrete = true; direct.close(); };
 }
 
-function remplirTitre(s) {
-  document.querySelector('#titre-scrutin').textContent = `${s.nomPoste}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}`;
-  document.querySelector('#sous-titre').textContent = s.promotion ?? 'Toute l’université · Lingwala et N’djili';
-  document.title = `${s.nomPoste} – Résultats`;
+// --- La fenêtre plein écran (depuis la liste) ---------------------------
+
+const fenetre = document.querySelector('#plein-ecran');
+let arreterFenetre = null;
+
+function ouvrirPleinEcran(id) {
+  fenetre.querySelector('.titre-scrutin').textContent = 'Résultats';
+  fenetre.querySelector('.sous-titre-scrutin').textContent = '';
+  fenetre.querySelector('.contenu-resultat').innerHTML = '<p class="texte-doux">Chargement…</p>';
+  document.documentElement.classList.add('sans-defilement');   // la page derrière ne bouge plus
+  fenetre.showModal();
+  fenetre.scrollTop = 0;
+  arreterFenetre = afficherDetail(id, fenetre);
 }
+
+function fermerPleinEcran() {
+  if (arreterFenetre) arreterFenetre();
+  arreterFenetre = null;
+  document.documentElement.classList.remove('sans-defilement');
+  if (fenetre.open) fenetre.close();
+}
+
+fenetre.querySelector('.fermer-plein-ecran').addEventListener('click', fermerPleinEcran);
+fenetre.addEventListener('close', fermerPleinEcran);   // touche Échap
 
 // Les candidats sont affichés du MOINS de voix au PLUS de voix : le suspense
 // monte jusqu'au gagnant, qui apparaît en dernier.
@@ -248,6 +303,8 @@ async function animerBarres(racine) {
   const lignes = [...racine.querySelectorAll('.barre-ligne')];
   for (const ligne of lignes) {
     ligne.classList.add('visible');
+    // On garde à l'écran la barre qui s'anime.
+    ligne.scrollIntoView({ block: 'nearest', behavior: sansAnimation ? 'auto' : 'smooth' });
     await pause(250);
     const barre = ligne.querySelector('.barre-remplissage');
     barre.style.width = `${barre.dataset.largeurFinale}%`;

@@ -4,6 +4,7 @@
 import { ErreurMetier } from '../services/erreurs.js';
 import {
   chargerScrutins, listerVotants, ouvrirSeance, prolongerSeance, fermerSeance,
+  ouvrirVotesPromotion, fermerVotesPromotion, POSTES_DE_PROMOTION,
   devoiler, lancerSecondTour, declarerEluDOffice, changerModeDevoilement,
   ajouterCandidat, retirerCandidat, changerPhoto,
 } from '../services/scrutins.js';
@@ -126,6 +127,27 @@ export async function routesAdminScrutins(app) {
   }, action(async (requete) => ouvrirSeance(
     sql, requete.admin.id, requete.params.id, requete.params.campusId, requete.body.dureeMinutes
   )));
+
+  // Ouverture groupée : les votes cochés d'une promotion, même durée.
+  app.post('/promotions/:id/ouvrir-votes', {
+    preHandler: superviseur,
+    schema: {
+      params: parametresId,
+      body: {
+        type: 'object',
+        required: ['postes', 'dureeMinutes'],
+        properties: {
+          postes: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string', enum: POSTES_DE_PROMOTION } },
+          dureeMinutes: { type: 'integer' },
+        },
+      },
+    },
+  }, action(async (requete) => ouvrirVotesPromotion(
+    sql, requete.admin.id, requete.params.id, requete.body.postes, requete.body.dureeMinutes
+  )));
+
+  app.post('/promotions/:id/fermer-votes', { preHandler: superviseur, schema: { params: parametresId } },
+    action(async (requete) => fermerVotesPromotion(sql, requete.admin.id, requete.params.id)));
 
   app.post('/scrutins/:id/seances/:campusId/prolonger', {
     preHandler: superviseur,

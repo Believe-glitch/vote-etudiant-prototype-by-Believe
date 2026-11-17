@@ -65,8 +65,30 @@ export async function afficherVotes(conteneur, moi) {
       afficherMessage(zoneMessage, erreur.message);
       return;
     }
-    zoneListe.innerHTML = scrutins.map(blocScrutin).join('');
+    const groupe = estSuperviseur && valeur !== 'presidence' ? blocGroupe() : '';
+    zoneListe.innerHTML = groupe + scrutins.map(blocScrutin).join('');
     appliquerLargeurs(zoneListe);
+  }
+
+  // Ouverture groupée : CP, CPA et secrétaire de la promotion, même durée.
+  const NOMS_GROUPE = { CP: 'CP', CPA: 'CPA', SECRETAIRE: 'Secrétaire' };
+  function blocGroupe() {
+    const unVoteOuvert = scrutins.some((s) => s.seances.some((se) => se.statut === 'ouverte'));
+    return `
+      <article class="carte groupe-promotion">
+        <h2>Toute la promotion en une fois</h2>
+        <p class="texte-doux petit">Ouvre les postes cochés en même temps, avec la même durée.
+          Un vote qui ne peut pas s’ouvrir (un seul candidat, déjà ouvert…) est signalé et laissé de côté.</p>
+        <form class="rangee-boutons" data-action="ouvrir-groupe">
+          ${Object.entries(NOMS_GROUPE).map(([poste, nom]) => `
+            <label class="case"><input type="checkbox" name="poste" value="${poste}" checked> ${nom}</label>`).join('')}
+          <label class="case" for="duree-groupe">Durée (minutes)</label>
+          <input id="duree-groupe" class="champ-duree" name="duree" type="number" min="1" max="240" value="20" required>
+          <button class="bouton" type="submit">Ouvrir les votes cochés</button>
+        </form>
+        ${unVoteOuvert ? `<div class="rangee-boutons section">
+          <button class="bouton bouton-danger bouton-petit" data-action="fermer-groupe" type="button">Fermer tous les votes ouverts de la promotion</button></div>` : ''}
+      </article>`;
   }
 
   function blocScrutin(s) {
@@ -224,6 +246,32 @@ export async function afficherVotes(conteneur, moi) {
         `Candidat « ${nom} » ajouté.`);
     }
 
+    if (formulaire.dataset.action === 'ouvrir-groupe') {
+      const postes = [...formulaire.querySelectorAll('input[name="poste"]:checked')].map((x) => x.value);
+      const dureeMinutes = Number(formulaire.elements.duree.value);
+      if (postes.length === 0) return afficherMessage(zoneMessage, 'Cochez au moins un poste.');
+      const promotion = choix.selectedOptions[0].textContent;
+      const ok = await confirmer({
+        titre: 'Ouvrir plusieurs votes',
+        texte: `Tu vas ouvrir <strong>${postes.map((p) => NOMS_GROUPE[p]).join(', ')}</strong>
+          pour <strong>${e(promotion)}</strong>, pendant <strong>${dureeMinutes} minutes</strong>.
+          Les listes de candidats ne pourront plus changer.`,
+        bouton: 'Ouvrir ces votes',
+      });
+      if (!ok) return;
+      try {
+        const r = await api(`/api/admin/promotions/${Number(choix.value)}/ouvrir-votes`, { methode: 'POST', corps: { postes, dureeMinutes } });
+        const ouverts = r.ouverts.map((o) => NOMS_GROUPE[o.poste]).join(', ');
+        const ignores = r.ignores.map((i) => `${NOMS_GROUPE[i.poste]} (${i.raison})`).join(' ; ');
+        afficherMessage(zoneMessage,
+          `${ouverts ? `Votes ouverts : ${ouverts}.` : 'Aucun vote ouvert.'}${ignores ? ` Laissé${r.ignores.length > 1 ? 's' : ''} de côté : ${ignores}` : ''}`,
+          r.ouverts.length ? 'ok' : undefined);
+      } catch (erreur) {
+        afficherMessage(zoneMessage, erreur.message);
+      }
+      await charger();
+    }
+
     if (formulaire.dataset.action === 'ouvrir') {
       const dureeMinutes = Number(formulaire.elements.duree.value);
       const scrutin = scrutins.find((x) => x.id === id);
@@ -269,6 +317,16 @@ export async function afficherVotes(conteneur, moi) {
       case 'retirer': {
         const ok = await confirmer({ titre: 'Retirer ce candidat ?', texte: 'Il disparaîtra de la liste.', bouton: 'Retirer', danger: true });
         if (ok) await agir(() => api(`/api/admin/candidats/${bouton.dataset.candidat}`, { methode: 'DELETE' }), 'Candidat retiré.');
+        break;
+      }
+      case 'fermer-groupe': {
+        const ok = await confirmer({ titre: 'Fermer tous les votes ouverts ?', texte: 'Tous les votes ouverts de cette promotion seront fermés tout de suite.', bouton: 'Fermer les votes', danger: true });
+        if (ok) {
+          await agir(async () => {
+            const r = await api(`/api/admin/promotions/${Number(choix.value)}/fermer-votes`, { methode: 'POST' });
+            if (r.fermes.length === 0) throw new Error('Aucun vote n’était ouvert.');
+          }, 'Les votes ouverts de la promotion sont fermés.');
+        }
         break;
       }
       case 'prolonger':

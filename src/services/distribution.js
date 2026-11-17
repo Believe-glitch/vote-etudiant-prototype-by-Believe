@@ -109,7 +109,14 @@ export async function listerPromotion(sql, promotionId) {
     select e.id, e.matricule, e.nom, e.postnom, e.prenom, e.inscrit_le,
       a.nom_complet as inscrit_par,
       (select cree_le from code_vote where etudiant_id = e.id and statut = 'actif') as code_remis_le,
-      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule' and not par_nettoyage) as remplacements
+      (select count(*)::int from code_vote where etudiant_id = e.id and statut = 'annule' and not par_nettoyage) as remplacements,
+      -- Les postes pour lesquels il a DÉJÀ voté (avec n'importe lequel de ses codes).
+      -- On sait SI il a voté, jamais POUR QUI : les voix sont rangées à part,
+      -- sans lien avec l'étudiant.
+      (select coalesce(array_agg(distinct s.poste), '{}') from participation pa
+         join code_vote co on co.id = pa.code_id
+         join scrutin s on s.id = pa.scrutin_id
+        where co.etudiant_id = e.id) as postes_votes
     from etudiant e
     left join compte_admin a on a.id = e.inscrit_par
     where e.promotion_id = ${promotionId}`;
@@ -126,6 +133,7 @@ export async function listerPromotion(sql, promotionId) {
       inscritPar: l.inscrit_par,
       codeRemisLe: l.code_remis_le,
       remplacements: l.remplacements,
+      postesVotes: l.postes_votes,
     }))
     .sort((a, b) => a.nomComplet.localeCompare(b.nomComplet, 'fr', { sensitivity: 'base' }))
     .map((e, index) => ({ numero: index + 1, ...e }));
@@ -134,6 +142,7 @@ export async function listerPromotion(sql, promotionId) {
     promotion: { id: promotion.id, campusId: promotion.campus_id, libelle: libellePromotion(promotion) },
     inscrits: etudiants.length,
     codesRemis: etudiants.filter((e) => e.codeRemisLe).length,
+    votants: etudiants.filter((e) => e.postesVotes.length > 0).length,
     etudiants,
   };
 }
