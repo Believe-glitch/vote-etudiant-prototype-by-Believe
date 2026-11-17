@@ -1,4 +1,4 @@
-// Onglet « Votes » : candidats, ouverture et fermeture des séances,
+// Onglet « Candidats et séances » : candidats, ouverture et fermeture des séances,
 // dévoilement des résultats, second tour.
 // Le superviseur agit ; l'observateur voit la même chose sans les boutons.
 
@@ -27,7 +27,7 @@ export async function afficherVotes(conteneur, moi) {
 
   conteneur.innerHTML = `
     <section class="carte carte-simple">
-      <label for="choix-scrutins">Afficher les votes de</label>
+      <label for="choix-scrutins">Choisir la promotion (ou la présidence)</label>
       <select id="choix-scrutins">
         <option value="presidence">Présidence de l’université</option>
         ${optionsPromotions}

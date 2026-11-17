@@ -86,7 +86,7 @@ Ouvre trois fenêtres : une pour le **distributeur**, une pour le **superviseur*
    Tape un nom (ex. « Matondo », postnom « Lusala », prénom « Jonas ») → *Inscrire et remettre le code*.
    L’étudiant apparaît dans la liste de sa promotion, et son code s’affiche
    **une seule fois** : note-le. Le bouton *Imprimer la liste* donne une liste d’émargement.
-2. **Superviseur** → onglet *Votes* → même promotion → sur le CP, durée **3** minutes →
+2. **Superviseur** → onglet *Candidats et séances* → même promotion → sur le CP, durée **3** minutes →
    *Ouvrir le vote*.
 3. **Visiteur** (sur le vidéoprojecteur) → *Résultats* → clique sur le CP en cours :
    la page attend le dévoilement en montrant la participation en direct.
@@ -292,13 +292,13 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
   affiche `L2INF-LIN-QVM355` (les sites LIN et NDJI sont reconnus).
 - En démonstration, la plupart des étudiants fictifs ont déjà reçu leur code ; les deux derniers
   de chaque promotion pas encore. Les candidats fictifs ont un portrait dessiné (dossier
-  `src/base/photos-demo`) ; un vrai candidat reçoit sa vraie photo depuis l’onglet *Votes*.
+  `src/base/photos-demo`) ; un vrai candidat reçoit sa vraie photo depuis l’onglet *Candidats et séances*.
 
 ---
 
 ## 10. Ouvrir plusieurs votes d’un coup et voir les résultats en grand
 
-- **Ouverture groupée** : dans l’onglet *Votes*, quand une promotion est choisie, la carte
+- **Ouverture groupée** : dans l’onglet *Candidats et séances*, quand une promotion est choisie, la carte
   *Toute la promotion en une fois* ouvre les postes cochés (CP, CPA, secrétaire) avec la même
   durée. Un vote qui ne peut pas s’ouvrir (un seul candidat, déjà ouvert…) est signalé et laissé
   de côté. Un bouton ferme d’un coup tous les votes ouverts de la promotion.

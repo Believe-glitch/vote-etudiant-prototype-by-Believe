@@ -66,7 +66,7 @@ export async function afficherNettoyage(conteneur) {
       <p class="texte-doux">Pour repartir propre après des essais. Chaque nettoyage demande votre mot de passe et le mot <strong>EFFACER</strong>.
         Le journal n’est jamais effacé : chaque nettoyage y est noté, avec votre nom et l’heure.</p>
       ${bloque ? `<div class="message message-erreur" role="alert">
-        Un vote est ouvert en ce moment : le nettoyage est impossible jusqu’à sa fermeture (onglet <em>Votes</em>).
+        Un vote est ouvert en ce moment : le nettoyage est impossible jusqu’à sa fermeture (onglet <em>Candidats et séances</em>).
         <br><strong>${etat.votesOuverts.map(e).join(' ; ')}</strong></div>` : ''}
       <div id="message-nettoyage"></div>
     </section>
