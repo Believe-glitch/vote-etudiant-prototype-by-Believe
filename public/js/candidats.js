@@ -1,6 +1,7 @@
 // Page des candidats, ouverte à tous (visiteurs compris).
 
 import { api, e, photoCandidat, afficherMessage, marquerPageCourante, sessionEtudiant } from './commun.js';
+import { brancherLiensResultats } from './resultat-anime.js';
 
 marquerPageCourante();
 
@@ -12,6 +13,7 @@ const zoneListe = document.querySelector('#liste');
 const zoneMessage = document.querySelector('#message');
 const ongletPromotions = document.querySelector('#onglet-promotions');
 const ongletPresidence = document.querySelector('#onglet-presidence');
+brancherLiensResultats(zoneListe);   // « Voir le résultat » s'ouvre en plein écran
 
 const STATUTS = {
   preparation: ['Vote pas encore ouvert', ''],
@@ -78,7 +80,7 @@ function afficher(scrutins) {
         </div>
         <p class="texte-doux petit">${e(s.promotion ?? 'Toute l’université · Lingwala et N’djili')}</p>
         ${candidats}
-        ${s.statut === 'devoile' && !s.eluDOffice ? `<p class="section"><a href="/resultats?scrutin=${s.id}">Voir les résultats</a></p>` : ''}
+        ${s.statut === 'devoile' && !s.eluDOffice ? `<p class="section"><a class="bouton bouton-contour bouton-petit" href="/resultats?scrutin=${s.id}" data-resultat="${s.id}">Voir le résultat</a></p>` : ''}
       </article>`;
   }).join('');
 }

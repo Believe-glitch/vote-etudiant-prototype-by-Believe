@@ -288,8 +288,13 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
   **pour qui**. Au remplacement d’un code perdu, le site rappelle les postes déjà votés : le
   nouveau code ne pourra pas revoter pour eux.
 - L’observateur consulte les listes, sans pouvoir les modifier.
-- Côté étudiant, les **tirets du code se placent tout seuls** : il tape `L2INFLINQVM355`, le champ
-  affiche `L2INF-LIN-QVM355` (les sites LIN et NDJI sont reconnus).
+- Côté étudiant, les **tirets du code se placent tout seuls**, dès qu’une partie est finie (comme
+  les « / » d’une date de carte bancaire) : il tape `L2INF`, le tiret apparaît ; puis `LIN`, le
+  second tiret apparaît (les sites LIN et NDJI sont reconnus). Sous le champ, une aide vérifie en
+  direct : faculté inconnue, site inconnu, caractère interdit (0, O, 1, I, L), « Encore 3 caractères »,
+  puis « ✓ Le code est complet ».
+- Après la connexion, l’étudiant **reste sur l’accueil** : un message « Connexion réussie » lui
+  indique combien de votes l’attendent, et c’est lui qui clique sur *Mes votes*.
 - En démonstration, la plupart des étudiants fictifs ont déjà reçu leur code ; les deux derniers
   de chaque promotion pas encore. Les candidats fictifs ont un portrait dessiné (dossier
   `src/base/photos-demo`) ; un vrai candidat reçoit sa vraie photo depuis l’onglet *Candidats et séances*.
@@ -304,9 +309,11 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
   de côté. Un bouton ferme d’un coup tous les votes ouverts de la promotion.
 - **Accueil** : il montre au plus 3 votes en cours (ceux qui se ferment le plus tôt) et un lien
   *Voir tous les votes en cours* vers la page Résultats, qui a les filtres.
-- **Résultat en plein écran** : sur la page Résultats, un clic sur un résultat ouvre une fenêtre
-  plein écran ; la page derrière est bloquée, l’animation se joue au centre (*Rejouer*, *Fermer*,
-  ou la touche Échap). Le lien direct `/resultats?scrutin=12` reste utilisable pour projeter.
+- **Résultat en plein écran** : un clic sur *Voir le résultat* (page Résultats, *Mes votes* ou
+  Candidats) ouvre une fenêtre au centre, sur un fond sombre ; la page derrière est bloquée et
+  l’animation se joue (*Rejouer* et *Fermer* en haut, un clic à côté ou la touche Échap pour sortir).
+  Sur téléphone, la fenêtre prend tout l’écran. Le code est dans `public/js/resultat-anime.js`.
+  Le lien direct `/resultats?scrutin=12` reste utilisable pour projeter.
 
 - **Espace étudiant** : un étudiant connecté voit d’abord ce qui le concerne. *Mes votes* suit
   chacun de ses postes (pas encore ouvert → ouvert → voté → résultats dévoilés, avec le nom de
@@ -355,7 +362,8 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
   officiels et aux **votes ouverts** (leur carte est encadrée d’or). Change une valeur, tout le site suit.
 - **Le mode clair et le mode sombre** : le bloc `[data-theme="sombre"]` du même fichier donne les
   couleurs du mode sombre. Le petit fichier `public/js/theme.js` choisit le mode : celui du téléphone
-  par défaut, ou celui choisi avec le bouton ◐ (retenu par le navigateur).
+  par défaut, ou celui choisi avec le bouton ◐ (retenu par le navigateur). Sur téléphone, ce
+  bouton rond est dans la barre du haut, à côté du menu, sur toutes les pages.
 - **Le menu** : sur ordinateur, les liens sont dans la barre du haut ; sur téléphone et tablette,
   ils sont dans le menu « trois barres » (géré aussi par `public/js/theme.js`).
 - **L’écusson de l’université** est dans `public/images/` (deux tailles). Il est affiché dans le bandeau

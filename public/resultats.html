@@ -18,6 +18,7 @@
         <span class="entete-ecusson"><img src="/images/ecusson-urkim-144.webp" alt="" width="129" height="144"></span>
         <span class="logo-mot" aria-hidden="true">URKIM<span class="logo-accent">e</span><svg class="logo-tel" viewBox="0 -12 70 116" aria-hidden="true"><rect class="tel-trait" x="6" y="4" width="52" height="96" rx="13"/><line class="tel-trait tel-fin" x1="26" y1="15" x2="38" y2="15"/><circle class="tel-plein" cx="32" cy="87" r="3.2"/><path class="tel-halo" d="M20 39 L31 62 L62 -6"/><path class="tel-v" d="M20 39 L31 62 L62 -6"/></svg>ote</span>
       </a>
+      <button class="bouton-theme bouton-theme-mobile" type="button" aria-pressed="false" aria-label="Passer en mode sombre"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
       <button class="bouton-menu" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
       <nav id="menu-principal" class="navigation" aria-label="Menu principal">
         <div class="navigation-liens">
@@ -89,22 +90,6 @@
       <div class="message-resultat"></div>
       <div id="contenu-resultat" class="contenu-resultat"></div>
     </div>
-
-    <!-- Fenêtre plein écran : un clic sur un résultat de la liste l'ouvre.
-         La page derrière est bloquée pendant l'animation. -->
-    <dialog id="plein-ecran" class="plein-ecran" aria-labelledby="plein-ecran-titre">
-      <div class="plein-ecran-contenu">
-        <div class="plein-ecran-entete">
-          <div>
-            <h1 id="plein-ecran-titre" class="titre-scrutin">Résultats</h1>
-            <p class="sous-titre-scrutin texte-doux"></p>
-          </div>
-          <button class="bouton bouton-contour fermer-plein-ecran" type="button">Fermer ✕</button>
-        </div>
-        <div class="message-resultat"></div>
-        <div class="contenu-resultat"></div>
-      </div>
-    </dialog>
   </main>
 
   <footer class="pied">

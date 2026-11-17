@@ -6,17 +6,15 @@
 // sur « Dévoiler », la page projetée lance l'animation toute seule.
 
 import {
-  api, e, photoCandidat, afficherMessage, ecouterDirect, blocSeance, appliquerLargeurs,
-  pourcentage, lancerDecomptes, marquerPageCourante, sessionEtudiant,
+  api, e, ecouterDirect, blocSeance, appliquerLargeurs, lancerDecomptes, marquerPageCourante, sessionEtudiant,
 } from './commun.js';
 import { brancherFiltrePromotion, pourComparer } from './filtres.js';
+import { afficherDetail, brancherLiensResultats } from './resultat-anime.js';
 
 marquerPageCourante();
 lancerDecomptes();
 
 const scrutinId = Number(new URLSearchParams(location.search).get('scrutin'));
-const sansAnimation = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const pause = (ms) => new Promise((resolve) => setTimeout(resolve, sansAnimation ? 0 : ms));
 
 let versionConnue = null;
 
@@ -71,7 +69,7 @@ async function demarrerListe() {
     zoneAttente.innerHTML = attente.length === 0
       ? '<p class="texte-doux">Aucun vote en cours ni en attente pour ce choix.</p>'
       : attente.map((s) => `
-          <a class="carte" href="/resultats?scrutin=${s.scrutinId}" data-scrutin="${s.scrutinId}">
+          <a class="carte" href="/resultats?scrutin=${s.scrutinId}" data-resultat="${s.scrutinId}">
             <h3>${e(s.nomPoste)}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}</h3>
             <p class="texte-doux petit">${e(s.promotion ?? 'Toute l’université')} · séance de ${e(s.campus)}</p>
             ${blocSeance(s)}
@@ -80,7 +78,7 @@ async function demarrerListe() {
     zoneDevoiles.innerHTML = resultats.length === 0
       ? `<p class="texte-doux">${devoiles.length === 0 ? 'Aucun résultat dévoilé pour le moment.' : 'Aucun résultat ne correspond à ces filtres.'}</p>`
       : resultats.map((r) => `
-          <a class="carte" href="/resultats?scrutin=${r.id}" data-scrutin="${r.id}">
+          <a class="carte" href="/resultats?scrutin=${r.id}" data-resultat="${r.id}">
             <h3>${e(r.nomPoste)}${r.tour > 1 ? ` · ${r.tour}e tour` : ''}</h3>
             <p class="texte-doux petit">${e(r.promotion ?? 'Toute l’université')}</p>
             <span class="pastille pastille-devoile">${r.eluDOffice ? 'Élu(e) d’office' : r.complet ? 'Résultats complets' : 'Résultats partiels'}</span>
@@ -112,16 +110,9 @@ async function demarrerListe() {
   }
   afficher();   // la liste suit tout de suite le filtre choisi
 
-  // Un clic sur un résultat ouvre la fenêtre plein écran (Ctrl+clic ou clic
-  // du milieu ouvrent toujours la page dans un nouvel onglet).
-  for (const zone of [zoneAttente, zoneDevoiles]) {
-    zone.addEventListener('click', (evenement) => {
-      const lien = evenement.target.closest('a[data-scrutin]');
-      if (!lien || evenement.ctrlKey || evenement.metaKey || evenement.shiftKey || evenement.button !== 0) return;
-      evenement.preventDefault();
-      ouvrirPleinEcran(Number(lien.dataset.scrutin));
-    });
-  }
+  // Un clic sur un résultat ouvre la fenêtre plein écran.
+  brancherLiensResultats(zoneAttente);
+  brancherLiensResultats(zoneDevoiles);
 
   ecouterDirect((etat) => {
     seances = etat.seances;
@@ -133,254 +124,11 @@ async function demarrerListe() {
     }
   });
 }
-
 // ---------------------------------------------------------------------
-// Vue détail
+// Vue détail : /resultats?scrutin=12 (lien direct, ou projection dans la salle)
 // ---------------------------------------------------------------------
-// Le même affichage sert à deux endroits :
-//   - la page /resultats?scrutin=12 (lien direct, ou page projetée dans la salle) ;
-//   - la fenêtre plein écran qui s'ouvre quand on clique sur un résultat de la
-//     liste : la page derrière est bloquée, personne ne peut la faire défiler
-//     pendant l'animation, et on la voit en entier, au centre.
 
 function demarrerDetail() {
   document.querySelector('#vue-detail').classList.remove('cache');
   afficherDetail(scrutinId, document.querySelector('#vue-detail'), { titreDuDocument: true });
-}
-
-// Affiche (et anime) le résultat d'un scrutin dans « racine ».
-// Renvoie une fonction qui arrête le direct (à appeler en fermant la fenêtre).
-function afficherDetail(id, racine, { titreDuDocument = false } = {}) {
-  const $ = (selecteur) => racine.querySelector(selecteur);
-  const zoneContenu = $('.contenu-resultat');
-  const zoneMessage = $('.message-resultat');
-  let dejaAffiche = null;   // ce qu'on a déjà animé, pour ne pas rejouer sans raison
-  let versionVue = null;
-  let arrete = false;
-
-  function remplirTitre(s) {
-    $('.titre-scrutin').textContent = `${s.nomPoste}${s.tour > 1 ? ` · ${s.tour}e tour` : ''}`;
-    $('.sous-titre-scrutin').textContent = s.promotion ?? 'Toute l’université · Lingwala et N’djili';
-    if (titreDuDocument) document.title = `${s.nomPoste} – Résultats`;
-  }
-
-  async function charger() {
-    try {
-      const resultat = await api(`/api/resultats/${id}`);
-      if (arrete) return;
-      const empreinte = JSON.stringify([resultat.complet, resultat.parSite.map((s) => s.campusId)]);
-      if (empreinte === dejaAffiche) return;
-      dejaAffiche = empreinte;
-      afficherMessage(zoneMessage, '');
-      await afficherResultat(resultat);
-    } catch (erreur) {
-      if (arrete) return;
-      if (erreur.statut === 403) {
-        // Pas encore dévoilé : on attend, en montrant la participation en direct.
-        const scrutin = await api(`/api/scrutins/${id}`).catch(() => null);
-        afficherAttente(scrutin);
-      } else {
-        afficherMessage(zoneMessage, erreur.message);
-      }
-    }
-  }
-
-  function afficherAttente(scrutin) {
-    if (scrutin) remplirTitre(scrutin);
-    const seances = scrutin ? scrutin.seances.filter((s) => s.statut !== 'attente') : [];
-    zoneContenu.innerHTML = `
-      <div class="bandeau section">
-        <h2>Résultats pas encore dévoilés</h2>
-        <p>Cet écran s’animera tout seul dès que le superviseur dévoilera les résultats.</p>
-        <div class="participation-direct">
-          ${seances.map((s) => `<div class="section"><h3>Séance de ${e(s.campus)}</h3>${blocSeance(s)}</div>`).join('')}
-        </div>
-      </div>`;
-    appliquerLargeurs(zoneContenu);
-  }
-
-  const direct = ecouterDirect((etat) => {
-    if (arrete) return;
-    const zoneDirect = $('.participation-direct');
-    if (zoneDirect) {
-      const miennes = etat.seances.filter((s) => s.scrutinId === id);
-      zoneDirect.innerHTML = miennes.map((s) => `<div class="section"><h3>Séance de ${e(s.campus)}</h3>${blocSeance(s)}</div>`).join('');
-      if (miennes[0]) remplirTitre({ nomPoste: miennes[0].nomPoste, tour: miennes[0].tour, promotion: miennes[0].promotion });
-      appliquerLargeurs(zoneDirect);
-    }
-    if (etat.versionResultats !== versionVue) {
-      versionVue = etat.versionResultats;
-      charger();
-    }
-  });
-
-  async function afficherResultat(r) {
-    remplirTitre(r.scrutin);
-
-    if (r.eluDOffice) {
-      const elu = r.candidats[0];
-      zoneContenu.innerHTML = `
-        <div class="carte section ligne-flex">
-          <div class="ligne-flex">${photoCandidat(elu, 'photo-grande')}
-            <div><h2>${e(elu.nom)}</h2><p>${e(r.places[0].nomPlace)} d’office : seul(e) candidat(e) à ce poste.</p></div>
-          </div>
-        </div>`;
-      return;
-    }
-
-    if (!r.complet) {
-      // Mode "par site" : on montre seulement les sites déjà dévoilés.
-      zoneContenu.innerHTML = r.parSite.map((site) => `
-        <section class="carte section">
-          <h2>Site de ${e(site.campus)}</h2>
-          <p>${site.votants} votants sur ${site.inscrits} inscrits (${pourcentage(site.votants, site.inscrits)} %)</p>
-          <div class="barres">${lignesBarres(site.candidats, [])}</div>
-        </section>`).join('') +
-        '<p class="message">Résultats partiels : le total et les élus seront connus quand tous les sites auront voté.</p>';
-      await animerBarres(zoneContenu);
-      return;
-    }
-
-    const { votants, inscrits } = r.participation;
-    zoneContenu.innerHTML = `
-      <section class="bandeau section">
-        <p>Participation</p>
-        <p class="resultat-chiffre"><span class="compteur-votants">0</span> <span class="petit">votants sur ${inscrits} inscrits</span></p>
-        <p class="taux cache">${pourcentage(votants, inscrits)} % de participation</p>
-      </section>
-      <section class="carte section">
-        <h2>Voix par candidat</h2>
-        <div class="barres">${lignesBarres(r.candidats, r.places)}</div>
-        <div class="conclusion"></div>
-      </section>
-      ${r.parSite.length > 1 ? tableauParSite(r) : ''}
-      <p class="rangee-boutons section"><button class="bouton bouton-contour bouton-rejouer" type="button">Rejouer l’animation</button></p>`;
-
-    $('.bouton-rejouer').addEventListener('click', () => {
-      dejaAffiche = null;
-      afficherResultat(r);
-    });
-
-    await compter($('.compteur-votants'), votants, 1200);
-    $('.taux').classList.remove('cache');
-    await pause(500);
-    await animerBarres(zoneContenu);
-    $('.conclusion').innerHTML = conclusion(r);
-    $('.conclusion').scrollIntoView({ block: 'nearest', behavior: sansAnimation ? 'auto' : 'smooth' });
-  }
-
-  charger();
-  return () => { arrete = true; direct.close(); };
-}
-
-// --- La fenêtre plein écran (depuis la liste) ---------------------------
-
-const fenetre = document.querySelector('#plein-ecran');
-let arreterFenetre = null;
-
-function ouvrirPleinEcran(id) {
-  fenetre.querySelector('.titre-scrutin').textContent = 'Résultats';
-  fenetre.querySelector('.sous-titre-scrutin').textContent = '';
-  fenetre.querySelector('.contenu-resultat').innerHTML = '<p class="texte-doux">Chargement…</p>';
-  document.documentElement.classList.add('sans-defilement');   // la page derrière ne bouge plus
-  fenetre.showModal();
-  fenetre.scrollTop = 0;
-  arreterFenetre = afficherDetail(id, fenetre);
-}
-
-function fermerPleinEcran() {
-  if (arreterFenetre) arreterFenetre();
-  arreterFenetre = null;
-  document.documentElement.classList.remove('sans-defilement');
-  if (fenetre.open) fenetre.close();
-}
-
-fenetre.querySelector('.fermer-plein-ecran').addEventListener('click', fermerPleinEcran);
-fenetre.addEventListener('close', fermerPleinEcran);   // touche Échap
-
-// Les candidats sont affichés du MOINS de voix au PLUS de voix : le suspense
-// monte jusqu'au gagnant, qui apparaît en dernier.
-function lignesBarres(candidats, places) {
-  const maximum = Math.max(1, ...candidats.map((c) => c.voix));
-  const placeDe = new Map(places.map((p) => [p.candidatId, p.nomPlace]));
-  return [...candidats]
-    .sort((a, b) => a.voix - b.voix)
-    .map((c) => `
-      <div class="barre-ligne ${placeDe.has(c.id) ? 'gagnant' : ''}">
-        ${photoCandidat(c, 'petite')}
-        <div>
-          <div class="barre-entete">
-            <span>${e(c.nom)}${placeDe.has(c.id) ? `<span class="badge-place">${e(placeDe.get(c.id))}</span>` : ''}</span>
-            <span class="barre-voix" data-voix="${c.voix}">0</span>
-          </div>
-          <div class="barre-fond"><div class="barre-remplissage" data-largeur-finale="${Math.round((c.voix / maximum) * 100)}"></div></div>
-        </div>
-      </div>`).join('');
-}
-
-async function animerBarres(racine) {
-  const lignes = [...racine.querySelectorAll('.barre-ligne')];
-  for (const ligne of lignes) {
-    ligne.classList.add('visible');
-    // On garde à l'écran la barre qui s'anime.
-    ligne.scrollIntoView({ block: 'nearest', behavior: sansAnimation ? 'auto' : 'smooth' });
-    await pause(250);
-    const barre = ligne.querySelector('.barre-remplissage');
-    barre.style.width = `${barre.dataset.largeurFinale}%`;
-    const voix = ligne.querySelector('.barre-voix');
-    await compter(voix, Number(voix.dataset.voix), 1100);
-    await pause(400);
-  }
-  for (const badge of racine.querySelectorAll('.badge-place')) badge.classList.add('visible');
-}
-
-// Fait défiler un nombre de 0 jusqu'à sa valeur finale.
-function compter(element, valeurFinale, duree) {
-  return new Promise((resolve) => {
-    if (sansAnimation || valeurFinale === 0) {
-      element.textContent = valeurFinale;
-      resolve();
-      return;
-    }
-    const debut = performance.now();
-    const etape = (instant) => {
-      const avancement = Math.min(1, (instant - debut) / duree);
-      element.textContent = Math.round(valeurFinale * (1 - Math.pow(1 - avancement, 3)));
-      if (avancement < 1) requestAnimationFrame(etape);
-      else resolve();
-    };
-    requestAnimationFrame(etape);
-  });
-}
-
-function conclusion(r) {
-  const nomDe = (id) => r.candidats.find((c) => c.id === id)?.nom ?? '';
-  let html = r.places.map((p) => `
-    <div class="message message-ok"><strong>${e(p.nomPlace)} :</strong> ${e(nomDe(p.candidatId))}</div>`).join('');
-
-  if (r.egalite) {
-    const noms = r.egalite.candidatIds.map(nomDe).map(e).join(', ');
-    html += `<div class="message"><strong>Égalité</strong> entre ${noms}. Un second tour départagera ces candidats.
-      ${r.secondTourId ? ` <a href="/resultats?scrutin=${r.secondTourId}">Suivre le second tour</a>` : ''}</div>`;
-  } else if (r.scrutin.poste === 'PRESIDENCE' && r.places.length < 2 && r.places.every((p) => p.rang === 1)) {
-    html += '<div class="message">Vice-présidence : poste vacant (pas assez de candidats).</div>';
-  }
-  return html;
-}
-
-function tableauParSite(r) {
-  const lignes = r.candidats.map((c) => `
-    <tr><td>${e(c.nom)}</td>
-      ${r.parSite.map((site) => `<td class="nombre">${site.candidats.find((x) => x.id === c.id)?.voix ?? 0}</td>`).join('')}
-      <td class="nombre"><strong>${c.voix}</strong></td></tr>`).join('');
-  return `
-    <section class="carte section">
-      <h2>Détail par site</h2>
-      <div class="tableau-conteneur"><table>
-        <thead><tr><th>Candidat</th>${r.parSite.map((s) => `<th class="nombre">${e(s.campus)}</th>`).join('')}<th class="nombre">Total</th></tr></thead>
-        <tbody>${lignes}
-          <tr class="total"><td>Votants</td>${r.parSite.map((s) => `<td class="nombre">${s.votants}</td>`).join('')}<td class="nombre">${r.participation.votants}</td></tr>
-        </tbody>
-      </table></div>
-    </section>`;
 }
