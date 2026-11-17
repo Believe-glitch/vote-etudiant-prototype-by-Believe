@@ -354,6 +354,8 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
   Le « e », le téléphone et le V restent toujours en or. Sur un fond clair, ajoute la classe
   `sur-clair` : les lettres deviennent foncées.
 - **L’icône de l’onglet** est `public/favicon.svg` ; celle des téléphones, `public/images/icone-180.png`.
+  Si tu changes l’icône, augmente le numéro `?v=2` dans les pages : sinon les navigateurs gardent
+  l’ancienne en mémoire.
 - **Le logo en image**, pour tes diapositives et tes documents : `public/images/logo-urkimevote-fond-fonce.png`
   (lettres blanches, à poser sur un fond bleu) et `logo-urkimevote-fond-clair.png` (lettres bleues, pour
   un fond blanc). Leur fond est transparent.
@@ -361,8 +363,11 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
   dominent, le noir sert aux boutons principaux, et l’or (`--or`) est réservé au logo, à l’Espace
   officiels et aux **votes ouverts** (leur carte est encadrée d’or). Change une valeur, tout le site suit.
 - **Le mode clair et le mode sombre** : le bloc `[data-theme="sombre"]` du même fichier donne les
-  couleurs du mode sombre. Le petit fichier `public/js/theme.js` choisit le mode : celui du téléphone
-  par défaut, ou celui choisi avec le bouton ◐ (retenu par le navigateur). Sur téléphone, ce
+  couleurs du mode sombre. Le petit fichier `public/js/theme.js` choisit le mode : le site s'ouvre
+  en mode clair et, à la **première visite**, une fenêtre demande « Mode clair ou sombre ? » (un clic
+  sur le rond change le mode en direct, *Continuer* retient le choix dans le navigateur). Elle ne
+  s'affiche ni sur l'Espace officiels, ni sur un résultat ouvert pour la projection. Ensuite, on
+  change de mode avec le bouton ◐. Sur téléphone, ce
   bouton rond est dans la barre du haut, à côté du menu, sur toutes les pages.
 - **Le menu** : sur ordinateur, les liens sont dans la barre du haut ; sur téléphone et tablette,
   ils sont dans le menu « trois barres » (géré aussi par `public/js/theme.js`).

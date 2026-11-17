@@ -802,3 +802,32 @@ label.case input[type="checkbox"] { width: 18px; height: 18px; accent-color: var
 .liste-choix { display: grid; gap: 0.5rem; }
 .bouton-choix { display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%; gap: 0.1rem; }
 .bouton-choix-danger { border-color: var(--alerte); color: var(--alerte); }
+
+/* --- La fenêtre « Mode clair ou sombre ? » (première visite) ------------- */
+dialog.choix-mode {
+  width: min(380px, calc(100vw - 40px));
+  margin: auto;
+  padding: 30px 26px 24px;
+  border: 0;
+  border-top: 5px solid var(--or);
+  border-radius: 20px;
+  background: var(--carte);
+  color: var(--texte);
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+dialog.choix-mode::backdrop { background: rgba(3, 10, 25, 0.78); backdrop-filter: blur(3px); }
+.choix-mode h2 { font-family: var(--police-titre); font-size: 1.3rem; margin: 0 0 6px; }
+.choix-mode p { margin: 0; color: var(--texte-doux); line-height: 1.45; }
+.choix-mode-rond {
+  display: grid; place-items: center;
+  width: 96px; height: 96px; margin: 22px auto 10px;
+  border-radius: 50%; border: 2px solid var(--trait-fort);
+  background: var(--fond); color: var(--texte); cursor: pointer;
+}
+.choix-mode-rond svg { width: 46px; height: 46px; }
+.choix-mode-rond:hover { border-color: var(--bleu); }
+.choix-mode-rond:focus-visible { outline: 3px solid var(--or); outline-offset: 3px; }
+.choix-mode .choix-mode-etat { font-weight: 700; color: var(--bleu-texte); margin-bottom: 20px; }
+.choix-mode .choix-mode-continuer { width: 100%; }
+:root[data-theme="sombre"] .choix-mode .choix-mode-continuer { background: #fff; border-color: #fff; color: #0b1220; }
