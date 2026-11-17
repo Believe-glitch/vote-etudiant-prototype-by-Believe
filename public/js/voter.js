@@ -8,6 +8,7 @@ import {
   api, e, photoCandidat, afficherMessage, ecouterDirect, blocSeance, appliquerLargeurs,
   lancerDecomptes, caleHorloge, secondesRestantes, marquerPageCourante,
 } from './commun.js';
+import { brancherLiensResultats } from './resultat-anime.js';
 
 marquerPageCourante();
 lancerDecomptes();
@@ -18,6 +19,7 @@ const zoneIdentite = document.querySelector('#identite');
 const zoneListe = document.querySelector('#liste-scrutins');
 const zoneMessage = document.querySelector('#message-general');
 const dialogue = document.querySelector('#confirmation');
+brancherLiensResultats(zoneListe);   // « Voir le résultat » s'ouvre en plein écran
 
 let moi = null;                 // ce que renvoie /api/etudiant/moi
 let signatureDirect = '';       // pour savoir si l'état des séances a changé
@@ -91,7 +93,7 @@ function blocScrutin(s) {
   } else if (s.statut === 'devoile') {
     etat = '<span class="pastille pastille-devoile">Résultats dévoilés</span>';
     contenu = `${nomsDesElus(s)}
-      <a class="bouton bouton-contour" href="/resultats?scrutin=${s.id}">Voir le résultat</a>`;
+      <a class="bouton bouton-contour" href="/resultats?scrutin=${s.id}" data-resultat="${s.id}">Voir le résultat</a>`;
   } else if (s.aVote) {
     // On ne rappelle jamais pour qui il a voté.
     etat = '<span class="pastille pastille-vote">✓ Vous avez voté</span>';
