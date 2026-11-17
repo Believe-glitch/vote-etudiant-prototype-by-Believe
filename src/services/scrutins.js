@@ -312,6 +312,66 @@ export async function fermerSeance(sql, adminId, scrutinId, campusId) {
   });
 }
 
+// --- Ouverture et fermeture groupées (une promotion) -------------------------
+// Ouvre en une fois les votes choisis d'une promotion (CP, CPA, secrétaire),
+// avec la même durée. Chaque vote est ouvert par ouvrirSeance, avec toutes
+// ses vérifications ; un vote qui ne peut pas s'ouvrir (déjà ouvert, un seul
+// candidat…) est simplement signalé, sans bloquer les autres.
+export const POSTES_DE_PROMOTION = ['CP', 'CPA', 'SECRETAIRE'];
+
+export async function ouvrirVotesPromotion(sql, adminId, promotionId, postes, dureeMinutes) {
+  if (!Number.isInteger(dureeMinutes) || dureeMinutes < 1 || dureeMinutes > DUREE_MAXIMALE_MINUTES) {
+    throw new ErreurMetier(`La durée doit être comprise entre 1 et ${DUREE_MAXIMALE_MINUTES} minutes.`);
+  }
+  const choisis = POSTES_DE_PROMOTION.filter((p) => postes.includes(p));
+  if (choisis.length === 0) throw new ErreurMetier('Cochez au moins un poste.');
+  const [promotion] = await sql`select campus_id from promotion where id = ${promotionId}`;
+  if (!promotion) throw new ErreurMetier('Promotion introuvable.', 404);
+
+  // Pour chaque poste, le tour le plus récent qui n'est pas encore dévoilé.
+  const lignes = await sql`
+    select distinct on (s.poste) s.id, s.poste, s.tour
+    from scrutin s
+    where s.promotion_id = ${promotionId} and s.poste in ${sql(choisis)} and s.statut <> 'devoile'
+    order by s.poste, s.tour desc`;
+
+  const ouverts = [];
+  const ignores = [];
+  for (const poste of choisis) {
+    const scrutin = lignes.find((l) => l.poste === poste);
+    if (!scrutin) {
+      ignores.push({ poste, raison: 'Résultats déjà dévoilés.' });
+      continue;
+    }
+    try {
+      await ouvrirSeance(sql, adminId, scrutin.id, promotion.campus_id, dureeMinutes);
+      ouverts.push({ poste, tour: scrutin.tour });
+    } catch (erreur) {
+      if (!(erreur instanceof ErreurMetier)) throw erreur;
+      ignores.push({ poste, raison: erreur.message });
+    }
+  }
+  return { ouverts, ignores };
+}
+
+// Ferme en une fois tous les votes ouverts d'une promotion.
+export async function fermerVotesPromotion(sql, adminId, promotionId) {
+  const ouvertes = await sql`
+    select s.id, s.poste, se.campus_id
+    from scrutin s join seance se on se.scrutin_id = s.id
+    where s.promotion_id = ${promotionId} and se.statut = 'ouverte'`;
+  const fermes = [];
+  for (const o of ouvertes) {
+    try {
+      await fermerSeance(sql, adminId, o.id, o.campus_id);
+      fermes.push({ poste: o.poste });
+    } catch (erreur) {
+      if (!(erreur instanceof ErreurMetier)) throw erreur;   // déjà fermé entre-temps : on passe
+    }
+  }
+  return { fermes };
+}
+
 // Appelée chaque seconde par le serveur : ferme les séances dont l'heure de
 // fin est passée. Renvoie true si quelque chose a changé.
 export async function fermerSeancesEchues(sql) {

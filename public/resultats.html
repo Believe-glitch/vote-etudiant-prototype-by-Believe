@@ -66,7 +66,7 @@
       </form>
 
       <section class="section">
-        <h2>Votes en cours et en attente du dévoilement</h2>
+        <h2 id="en-cours">Votes en cours et en attente du dévoilement</h2>
         <div id="en-attente" class="grille-3"></div>
       </section>
       <section class="section">
@@ -78,11 +78,27 @@
     <!-- Vue "détail" d'un scrutin (?scrutin=…) -->
     <div id="vue-detail" class="cache">
       <p><a href="/resultats">← Tous les résultats</a></p>
-      <h1 id="titre-scrutin">Résultats</h1>
-      <p id="sous-titre" class="texte-doux"></p>
-      <div id="message"></div>
-      <div id="contenu-resultat"></div>
+      <h1 class="titre-scrutin">Résultats</h1>
+      <p class="sous-titre-scrutin texte-doux"></p>
+      <div class="message-resultat"></div>
+      <div id="contenu-resultat" class="contenu-resultat"></div>
     </div>
+
+    <!-- Fenêtre plein écran : un clic sur un résultat de la liste l'ouvre.
+         La page derrière est bloquée pendant l'animation. -->
+    <dialog id="plein-ecran" class="plein-ecran" aria-labelledby="plein-ecran-titre">
+      <div class="plein-ecran-contenu">
+        <div class="plein-ecran-entete">
+          <div>
+            <h1 id="plein-ecran-titre" class="titre-scrutin">Résultats</h1>
+            <p class="sous-titre-scrutin texte-doux"></p>
+          </div>
+          <button class="bouton bouton-contour fermer-plein-ecran" type="button">Fermer ✕</button>
+        </div>
+        <div class="message-resultat"></div>
+        <div class="contenu-resultat"></div>
+      </div>
+    </dialog>
   </main>
 
   <footer class="pied">
