@@ -75,7 +75,10 @@ export async function construireApplication({ config, sql, journalisation = true
   await app.register(fichiersStatiques, {
     root: DOSSIER_PAGES,
     extensions: ['html'],        // /candidats ouvre candidats.html
-    maxAge: config.enProduction ? '1h' : 0,
+    // maxAge 0 : le navigateur redemande toujours au serveur si le fichier a changé
+    // (réponse « 304 » très légère s'il n'a pas changé). Ainsi, après une mise à jour,
+    // personne ne garde une vieille feuille de style avec une nouvelle page.
+    maxAge: 0,
   });
 
   // --- Contrôle des connexions -------------------------------------------

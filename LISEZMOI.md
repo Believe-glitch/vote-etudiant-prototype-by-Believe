@@ -355,7 +355,9 @@ En dernier recours (base abîmée), on peut encore tout effacer depuis Neon : **
   `sur-clair` : les lettres deviennent foncées.
 - **L’icône de l’onglet** est `public/favicon.svg` ; celle des téléphones, `public/images/icone-180.png`.
   Si tu changes l’icône, augmente le numéro `?v=2` dans les pages : sinon les navigateurs gardent
-  l’ancienne en mémoire.
+  l’ancienne en mémoire. Même chose pour `style.css?v=3` et `theme.js?v=3` si tu les modifies
+  beaucoup (le serveur demande déjà aux navigateurs de vérifier à chaque visite, mais certains
+  gardent quand même l’ancienne version).
 - **Le logo en image**, pour tes diapositives et tes documents : `public/images/logo-urkimevote-fond-fonce.png`
   (lettres blanches, à poser sur un fond bleu) et `logo-urkimevote-fond-clair.png` (lettres bleues, pour
   un fond blanc). Leur fond est transparent.
