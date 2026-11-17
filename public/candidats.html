@@ -39,7 +39,14 @@
     <h1>Les candidats</h1>
     <p class="texte-doux">Choisissez une promotion pour voir ses candidats au poste de CP, de CPA et de secrétaire, ou consultez les candidats à la présidence de l’université.</p>
 
-    <div class="onglets" role="tablist">
+    <!-- Étudiant connecté : on montre d'abord SA promotion et la présidence. -->
+    <div id="pour-vous" class="pour-vous cache">
+      <p class="petit texte-doux">Affiché pour vous :</p>
+      <p id="pour-vous-texte" class="pour-vous-titre"></p>
+      <button id="voir-tout" class="bouton bouton-contour bouton-petit" type="button">Voir toute l’université</button>
+    </div>
+
+    <div class="onglets" id="onglets-candidats" role="tablist">
       <button class="onglet" role="tab" id="onglet-promotions" aria-selected="true" type="button">Par promotion</button>
       <button class="onglet" role="tab" id="onglet-presidence" aria-selected="false" type="button">Présidence</button>
     </div>

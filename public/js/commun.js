@@ -157,4 +157,35 @@ export function marquerPageCourante() {
     const cible = new URL(lien.href).pathname.replace(/\.html$/, '').replace(/\/$/, '/index');
     if (cible === chemin) lien.setAttribute('aria-current', 'page');
   }
+  ajouterLienMesVotes();
+}
+
+// --- L'étudiant connecté ------------------------------------------------------
+// Une seule demande au serveur par page, partagée par tous ceux qui en ont besoin.
+let sessionEnCours = null;
+export function sessionEtudiant() {
+  if (!sessionEnCours) sessionEnCours = api('/api/etudiant/session').catch(() => ({ connecte: false }));
+  return sessionEnCours;
+}
+
+// Quand l'étudiant est connecté, « Mes votes » apparaît en premier dans le
+// menu, avec le nombre de votes qui l'attendent (ouverts, pas encore votés).
+async function ajouterLienMesVotes() {
+  const liens = document.querySelector('.navigation-liens');
+  if (!liens) return;
+  const session = await sessionEtudiant();
+  if (!session.connecte || liens.querySelector('.lien-mes-votes')) return;
+  const lien = document.createElement('a');
+  lien.href = '/voter';
+  lien.className = 'lien-mes-votes';
+  lien.textContent = 'Mes votes';
+  if (session.votesAFaire > 0) {
+    const compteur = document.createElement('span');
+    compteur.className = 'compteur-votes';
+    compteur.textContent = String(session.votesAFaire);
+    compteur.title = `${session.votesAFaire} vote${session.votesAFaire > 1 ? 's' : ''} vous attend${session.votesAFaire > 1 ? 'ent' : ''}`;
+    lien.append(' ', compteur);
+  }
+  if (location.pathname.replace(/\.html$/, '') === '/voter') lien.setAttribute('aria-current', 'page');
+  liens.prepend(lien);
 }

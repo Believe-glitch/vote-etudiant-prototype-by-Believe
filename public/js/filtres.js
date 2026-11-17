@@ -49,6 +49,16 @@ export function brancherFiltrePromotion({ site, faculte, promotion }, structure,
       if (promotion.value && p.id !== Number(promotion.value)) return false;
       return true;
     },
+    // Choisit une promotion précise (et son site et sa faculté).
+    choisir(promotionId) {
+      const p = promotionsParId.get(promotionId);
+      if (!p) return;
+      site.value = String(p.campusId);
+      remplirFacultes();
+      faculte.value = String(p.faculteId);
+      remplirPromotions();
+      promotion.value = String(p.id);
+    },
     // Remet tous les choix sur « Tous ».
     reinitialiser() {
       site.value = '';

@@ -52,9 +52,36 @@ export async function routesEtudiant(app) {
   });
 
   // Simple question « suis-je connecté ? », sans erreur si la réponse est non.
+  // L'étudiant est-il connecté ? Si oui, on dit aussi quelle est sa promotion
+  // (pour lui montrer d'abord ce qui le concerne) et combien de votes
+  // l'attendent en ce moment (ouverts sur son site, pas encore votés).
   app.get('/session', async (requete) => {
     const codeId = await lireSession(sql, 'etudiant', requete.cookies[COOKIE_ETUDIANT]);
-    return { connecte: codeId !== null };
+    if (codeId === null) return { connecte: false };
+    const [moi] = await sql`
+      select pr.id as promotion_id, pr.campus_id, pr.niveau, pr.filiere,
+        f.nom as faculte_nom, c.nom as campus_nom
+      from code_vote co
+      join etudiant e on e.id = co.etudiant_id
+      join promotion pr on pr.id = e.promotion_id
+      join faculte f on f.id = pr.faculte_id
+      join campus c on c.id = pr.campus_id
+      where co.id = ${codeId} and co.statut = 'actif'`;
+    if (!moi) return { connecte: false };
+    const [{ votesAFaire }] = await sql`
+      select count(*)::int as "votesAFaire"
+      from scrutin s
+      join seance se on se.scrutin_id = s.id and se.campus_id = ${moi.campus_id}
+      where (s.promotion_id = ${moi.promotion_id} or s.promotion_id is null)
+        and se.statut = 'ouverte' and se.fin > now()
+        and not exists (select 1 from participation pa where pa.scrutin_id = s.id and pa.code_id = ${codeId})`;
+    return {
+      connecte: true,
+      promotionId: moi.promotion_id,
+      campusId: moi.campus_id,
+      promotion: libellePromotion(moi),
+      votesAFaire,
+    };
   });
 
   // Ce que l'étudiant connecté peut voir : sa promotion et les votes qui le

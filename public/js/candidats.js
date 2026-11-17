@@ -1,6 +1,6 @@
 // Page des candidats, ouverte à tous (visiteurs compris).
 
-import { api, e, photoCandidat, afficherMessage, marquerPageCourante } from './commun.js';
+import { api, e, photoCandidat, afficherMessage, marquerPageCourante, sessionEtudiant } from './commun.js';
 
 marquerPageCourante();
 
@@ -21,6 +21,7 @@ const STATUTS = {
 };
 
 let structure = null;
+let modePourMoi = false;   // étudiant connecté : on montre seulement sa promotion + la présidence
 
 function options(liste, texte) {
   return liste.map((x) => `<option value="${x.id}">${e(texte(x))}</option>`).join('');
@@ -52,12 +53,15 @@ function derniersTours(scrutins) {
   return [...parPoste.values()];
 }
 
+// Ordre d'affichage des postes (la présidence en dernier).
+const ORDRE = { CP: 1, CPA: 2, SECRETAIRE: 3, PRESIDENCE: 4 };
+
 function afficher(scrutins) {
   if (scrutins.length === 0) {
     zoneListe.innerHTML = '<p class="texte-doux">Aucun scrutin pour cette sélection.</p>';
     return;
   }
-  zoneListe.innerHTML = derniersTours(scrutins).map((s) => {
+  zoneListe.innerHTML = derniersTours(scrutins).sort((a, b) => ORDRE[a.poste] - ORDRE[b.poste]).map((s) => {
     const [texteStatut, classeStatut] = STATUTS[s.statut];
     const candidats = s.candidats.length === 0
       ? '<p class="texte-doux">Aucun candidat : poste vacant.</p>'
@@ -80,6 +84,7 @@ function afficher(scrutins) {
 }
 
 async function chargerPromotion() {
+  if (modePourMoi) return;   // la liste « pour vous » est déjà affichée
   const promotionId = Number(selectPromo.value);
   if (!promotionId) {
     zoneListe.innerHTML = '';
@@ -130,6 +135,19 @@ async function demarrer() {
   // Si l'adresse indique déjà une promotion (lien partagé), on la présélectionne.
   const parametres = new URLSearchParams(location.search);
   const demandee = structure.promotions.find((p) => p.id === Number(parametres.get('promotion')));
+
+  // Étudiant connecté, sans lien précis dans l'adresse : on lui montre d'abord
+  // ce qui le concerne (sa promotion + la présidence). Un bouton rend tout visible.
+  const session = await sessionEtudiant();
+  if (session.connecte && !demandee && !parametres.get('presidence')) {
+    modePourMoi = true;
+    const p = structure.promotions.find((x) => x.id === session.promotionId);
+    if (p) selectSite.value = p.campusId;
+    remplirFacultes();
+    if (p) { selectFaculte.value = p.faculteId; remplirPromotions(); selectPromo.value = p.id; }
+    await afficherPourMoi(session);
+    return;
+  }
   if (demandee) {
     selectSite.value = demandee.campusId;
     remplirFacultes();
@@ -141,6 +159,30 @@ async function demarrer() {
     remplirFacultes();
   }
   if (parametres.get('presidence') === 'oui') choisirOnglet(true);
+}
+
+async function afficherPourMoi(session) {
+  const blocPourVous = document.querySelector('#pour-vous');
+  const onglets = document.querySelector('#onglets-candidats');
+  document.querySelector('#pour-vous-texte').textContent = `${session.promotion} + Présidence de l’université`;
+  blocPourVous.classList.remove('cache');
+  onglets.classList.add('cache');
+  formulaire.classList.add('cache');
+  try {
+    const [miens, presidence] = await Promise.all([
+      api(`/api/scrutins?promotion=${session.promotionId}`),
+      api('/api/scrutins?presidence=oui'),
+    ]);
+    afficher([...miens, ...presidence]);
+  } catch (erreur) {
+    afficherMessage(zoneMessage, erreur.message);
+  }
+  document.querySelector('#voir-tout').addEventListener('click', () => {
+    modePourMoi = false;
+    blocPourVous.classList.add('cache');
+    onglets.classList.remove('cache');
+    choisirOnglet(false);   // on part de sa promotion, déjà choisie dans les listes
+  }, { once: true });
 }
 
 demarrer();
