@@ -831,3 +831,15 @@ dialog.choix-mode::backdrop { background: rgba(3, 10, 25, 0.78); backdrop-filter
 .choix-mode .choix-mode-etat { font-weight: 700; color: var(--bleu-texte); margin-bottom: 20px; }
 .choix-mode .choix-mode-continuer { width: 100%; }
 :root[data-theme="sombre"] .choix-mode .choix-mode-continuer { background: #fff; border-color: #fff; color: #0b1220; }
+
+/* --- Filtres repliables (page Résultats, téléphone) ---------------------- */
+.filtres-entete { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.filtres-entete .petit-titre { margin: 0; }
+.corps-filtres { margin-top: 0.9rem; }
+@media (max-width: 759.98px) {
+  .filtres-repliables .corps-filtres { display: none; }
+  .filtres-repliables.ouvert .corps-filtres { display: block; }
+}
+@media (min-width: 760px) {
+  .bouton-filtrer { display: none; }
+}

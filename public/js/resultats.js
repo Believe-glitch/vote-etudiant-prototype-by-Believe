@@ -8,7 +8,7 @@
 import {
   api, e, ecouterDirect, blocSeance, appliquerLargeurs, lancerDecomptes, marquerPageCourante, sessionEtudiant,
 } from './commun.js';
-import { brancherFiltrePromotion, pourComparer } from './filtres.js';
+import { brancherFiltrePromotion } from './filtres.js';
 import { afficherDetail, brancherLiensResultats } from './resultat-anime.js';
 
 marquerPageCourante();
@@ -30,13 +30,12 @@ async function demarrerListe() {
   const zoneAttente = document.querySelector('#en-attente');
   const zoneDevoiles = document.querySelector('#devoiles');
   const champPoste = document.querySelector('#filtre-poste');
-  const champTexte = document.querySelector('#filtre-texte');
   const zoneCompte = document.querySelector('#compte-filtre');
 
   let devoiles = [];      // résultats dévoilés (liste complète, avant filtre)
   let seances = [];       // votes en cours ou en attente (direct)
 
-  // Le filtre : site → faculté → promotion, poste, et texte libre.
+  // Le filtre : site → faculté → promotion, et poste.
   // La présidence concerne tout le monde : elle reste visible quel que soit
   // le site, la faculté ou la promotion choisis (sauf si on filtre un poste).
   const structure = await api('/api/structure').catch(() => ({ campus: [], facultes: [], promotions: [] }));
@@ -46,20 +45,16 @@ async function demarrerListe() {
     promotion: document.querySelector('#filtre-promotion'),
   }, structure, afficher);
   champPoste.addEventListener('change', afficher);
-  champTexte.addEventListener('input', afficher);
   document.querySelector('#filtres').addEventListener('submit', (evenement) => evenement.preventDefault());
   document.querySelector('#effacer-filtres').addEventListener('click', () => {
     filtre.reinitialiser();
     champPoste.value = '';
-    champTexte.value = '';
     afficher();
   });
 
   function garde(element) {
     if (champPoste.value && element.poste !== champPoste.value) return false;
     if (element.promotionId !== null && !filtre.correspond(element.promotionId)) return false;
-    const texte = pourComparer(champTexte.value);
-    if (texte && !pourComparer(`${element.nomPoste} ${element.promotion ?? 'presidence universite'}`).includes(texte)) return false;
     return true;
   }
 
@@ -83,7 +78,28 @@ async function demarrerListe() {
             <p class="texte-doux petit">${e(r.promotion ?? 'Toute l’université')}</p>
             <span class="pastille pastille-devoile">${r.eluDOffice ? 'Élu(e) d’office' : r.complet ? 'Résultats complets' : 'Résultats partiels'}</span>
           </a>`).join('');
-    zoneCompte.textContent = `${resultats.length} résultat${resultats.length > 1 ? 's' : ''} dévoilé${resultats.length > 1 ? 's' : ''} sur ${devoiles.length}`;
+    zoneCompte.textContent = texteCompte(resultats.length, devoiles.length);
+    montrerNombreFiltres();
+  }
+
+  function texteCompte(affiches, total) {
+    if (total === 0) return '';   // la liste en dessous dit déjà « Aucun résultat dévoilé pour le moment »
+    const s = (n) => (n > 1 ? 's' : '');
+    if (affiches === total) return `${total} résultat${s(total)} dévoilé${s(total)}.`;
+    return `${affiches} sur ${total} résultat${s(total)} dévoilé${s(total)}.`;
+  }
+
+  // Téléphone : le bouton « Filtrer » ouvre ou replie les filtres,
+  // et indique combien de filtres sont choisis, ex. « Filtrer (2) ».
+  const formulaire = document.querySelector('#filtres');
+  const boutonFiltrer = document.querySelector('#ouvrir-filtres');
+  boutonFiltrer.addEventListener('click', () => {
+    const ouvert = formulaire.classList.toggle('ouvert');
+    boutonFiltrer.setAttribute('aria-expanded', String(ouvert));
+  });
+  function montrerNombreFiltres() {
+    const choisis = [...formulaire.querySelectorAll('select')].filter((s) => s.value !== '').length;
+    document.querySelector('#nombre-filtres').textContent = choisis ? ` (${choisis})` : '';
   }
 
   async function chargerListe() {
