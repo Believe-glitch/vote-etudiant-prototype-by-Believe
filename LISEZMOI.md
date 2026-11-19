@@ -309,6 +309,8 @@ CP, CPA et secrétaire de la nouvelle promotion sont créés tout seuls.
   de côté. Un bouton ferme d’un coup tous les votes ouverts de la promotion.
 - **Accueil** : il montre au plus 3 votes en cours (ceux qui se ferment le plus tôt) et un lien
   *Voir tous les votes en cours* vers la page Résultats, qui a les filtres.
+- Page **Résultats** : quatre filtres (site, faculté, promotion, poste). Sur téléphone, ils sont
+  repliés derrière le bouton *Filtrer*, qui montre combien de filtres sont choisis, ex. *Filtrer (2)*.
 - **Résultat en plein écran** : un clic sur *Voir le résultat* (page Résultats, *Mes votes* ou
   Candidats) ouvre une fenêtre au centre, sur un fond sombre ; la page derrière est bloquée et
   l’animation se joue (*Rejouer* et *Fermer* en haut, un clic à côté ou la touche Échap pour sortir).
